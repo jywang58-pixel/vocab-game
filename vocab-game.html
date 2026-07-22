@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>動詞ジム · Verb Dojo</title>
+<style>
+  :root{
+    --bg-1:#fdf6ec;
+    --bg-2:#f7ece0;
+    --ink:#2b2420;
+    --ink-soft:#6b5f55;
+    --accent:#c0392b;
+    --accent-dark:#9c2a1f;
+    --accent-soft:#e8c9b8;
+    --gold:#c99a2e;
+    --good:#2e8b57;
+    --good-bg:#e5f4ea;
+    --bad:#c0392b;
+    --bad-bg:#fbe8e6;
+    --card:#ffffff;
+    --line:#e7dccd;
+    --shadow: 0 10px 30px rgba(60,40,20,0.10);
+    font-family: "Hiragino Kaku Gothic ProN","Hiragino Sans","Noto Sans JP","Yu Gothic",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    min-height:100vh;
+    background: radial-gradient(1200px 600px at 50% -10%, var(--bg-2), var(--bg-1));
+    color:var(--ink);
+    display:flex;
+    justify-content:center;
+    padding:24px 16px 60px;
+  }
+  .app{ width:100%; max-width:640px; }
+
+  header.top{
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:18px; flex-wrap:wrap; gap:10px;
+  }
+  .brand{ display:flex; align-items:center; gap:10px; }
+  .brand .mark{
+    width:40px;height:40px;border-radius:12px;
+    background:linear-gradient(135deg,var(--accent),var(--accent-dark));
+    display:flex;align-items:center;justify-content:center;
+    color:#fff; font-weight:700; font-size:18px; box-shadow: var(--shadow);
+  }
+  .brand h1{ font-size:19px; margin:0; letter-spacing:0.2px; }
+  .brand p{ margin:0; font-size:12px; color:var(--ink-soft); }
+
+  .stats-bar{
+    background:var(--card); border:1px solid var(--line); border-radius:16px;
+    padding:12px 16px; margin-bottom:16px; box-shadow: var(--shadow);
+  }
+  .stats-row{ display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
+  .stat{ display:flex; flex-direction:column; min-width:56px; }
+  .stat .num{ font-size:18px; font-weight:700; }
+  .stat .lbl{ font-size:11px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:0.04em; }
+  .streak{ color:var(--accent); }
+  .xp-wrap{ flex:1; min-width:140px; }
+  .xp-bar-bg{ height:8px; background:var(--bg-2); border-radius:99px; overflow:hidden; border:1px solid var(--line); }
+  .xp-bar-fill{ height:100%; background:linear-gradient(90deg,var(--gold),var(--accent)); width:0%; transition:width .4s ease; }
+  .xp-label{ font-size:11px; color:var(--ink-soft); margin-top:4px; }
+
+  .modes{ display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap; }
+  .mode-btn{
+    border:1px solid var(--line); background:var(--card); color:var(--ink-soft);
+    padding:8px 14px; border-radius:99px; font-size:13px; cursor:pointer;
+    transition:all .15s ease;
+  }
+  .mode-btn.active{ background:var(--accent); border-color:var(--accent); color:#fff; font-weight:600; }
+  .mode-btn:hover{ transform:translateY(-1px); }
+
+  .card{
+    background:var(--card); border:1px solid var(--line); border-radius:20px;
+    padding:28px 24px; box-shadow: var(--shadow); min-height:260px;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; position:relative; overflow:hidden;
+  }
+  .card .badge{
+    position:absolute; top:14px; left:14px; font-size:11px; color:var(--ink-soft);
+    background:var(--bg-2); padding:4px 10px; border-radius:99px; border:1px solid var(--line);
+  }
+  .prompt-label{ font-size:12px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:10px;}
+  .prompt-word{ font-size:38px; font-weight:700; margin-bottom:4px; word-break:break-word; }
+  .prompt-sub{ font-size:14px; color:var(--ink-soft); margin-bottom:22px; }
+
+  .choices{ display:grid; grid-template-columns:1fr 1fr; gap:10px; width:100%; }
+  .choice-btn{
+    border:1.5px solid var(--line); background:#fffefb; border-radius:14px;
+    padding:14px 10px; font-size:16px; cursor:pointer; color:var(--ink);
+    transition:all .12s ease;
+  }
+  .choice-btn:hover{ border-color:var(--accent-soft); background:#fff7f2; }
+  .choice-btn.correct{ background:var(--good-bg); border-color:var(--good); color:var(--good); font-weight:700; }
+  .choice-btn.wrong{ background:var(--bad-bg); border-color:var(--bad); color:var(--bad); font-weight:700; }
+  .choice-btn.dim{ opacity:0.45; }
+  .choice-btn:disabled{ cursor:default; }
+
+  .type-form{ width:100%; }
+  .type-input{
+    width:100%; font-size:22px; padding:14px 16px; border-radius:12px;
+    border:1.5px solid var(--line); text-align:center; outline:none;
+    font-family:inherit;
+  }
+  .type-input:focus{ border-color:var(--accent); }
+  .type-actions{ display:flex; gap:10px; margin-top:14px; justify-content:center; }
+  .feedback-line{ margin-top:14px; font-size:14px; min-height:20px; }
+  .feedback-line.good{ color:var(--good); font-weight:600; }
+  .feedback-line.bad{ color:var(--bad); font-weight:600; }
+
+  .primary-btn, .ghost-btn{
+    border-radius:12px; padding:12px 20px; font-size:14px; cursor:pointer; font-weight:600;
+    border:1.5px solid transparent;
+  }
+  .primary-btn{ background:var(--accent); color:#fff; }
+  .primary-btn:hover{ background:var(--accent-dark); }
+  .ghost-btn{ background:transparent; border-color:var(--line); color:var(--ink-soft); }
+  .ghost-btn:hover{ border-color:var(--accent-soft); color:var(--ink); }
+
+  .toolbar{ display:flex; justify-content:space-between; align-items:center; margin-top:16px; flex-wrap:wrap; gap:10px; }
+  .sync-note{ font-size:12px; color:var(--ink-soft); }
+  .sync-note.err{ color:var(--bad); }
+  .link-btn{ background:none; border:none; color:var(--accent); font-size:12px; cursor:pointer; text-decoration:underline; padding:0; }
+
+  .state-box{ text-align:center; padding:40px 20px; color:var(--ink-soft); }
+  .spinner{
+    width:34px;height:34px;border-radius:50%;
+    border:3px solid var(--line); border-top-color:var(--accent);
+    animation:spin 0.8s linear infinite; margin:0 auto 16px;
+  }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+
+  .summary-emoji{ font-size:44px; margin-bottom:6px; }
+  .summary-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; width:100%; margin:18px 0; }
+  .summary-cell{ background:var(--bg-2); border-radius:12px; padding:12px; }
+  .summary-cell .num{ font-size:20px; font-weight:700; }
+  .summary-cell .lbl{ font-size:11px; color:var(--ink-soft); text-transform:uppercase; }
+
+  footer{ text-align:center; font-size:11px; color:var(--ink-soft); margin-top:20px; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header class="top">
+    <div class="brand">
+      <div class="mark">動</div>
+      <div>
+        <h1>Verb Dojo</h1>
+        <p>daily verb-conjugation practice</p>
+      </div>
+    </div>
+    <div class="modes" id="modeSelector">
+      <button class="mode-btn active" data-mode="mixed">Mixed</button>
+      <button class="mode-btn" data-mode="mc">Multiple Choice</button>
+      <button class="mode-btn" data-mode="type">Typing</button>
+    </div>
+  </header>
+
+  <div class="stats-bar">
+    <div class="stats-row">
+      <div class="stat"><span class="num" id="statLevel">1</span><span class="lbl">Level</span></div>
+      <div class="stat"><span class="num streak" id="statStreak">0 🔥</span><span class="lbl">Streak</span></div>
+      <div class="stat"><span class="num" id="statBest">0</span><span class="lbl">Best</span></div>
+      <div class="stat"><span class="num" id="statAcc">—</span><span class="lbl">Accuracy</span></div>
+      <div class="xp-wrap">
+        <div class="xp-bar-bg"><div class="xp-bar-fill" id="xpBar"></div></div>
+        <div class="xp-label" id="xpLabel">0 / 50 XP</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" id="card">
+    <div class="state-box">
+      <div class="spinner"></div>
+      <div>Loading your vocab from the sheet…</div>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <span class="sync-note" id="syncNote">Loading vocab…</span>
+    <button class="link-btn" id="refreshBtn">↻ Reload vocab</button>
+  </div>
+
+  <footer>Built for Sarah's Japanese vocab practice · words load from vocab-data.js in this folder</footer>
+</div>
+
+<script src="vocab-data.js"></script>
+<script>
+(function(){
+  // ---------- Fallback seed data (used only if vocab-data.js is missing/empty) ----------
+  var FALLBACK_WORDS = [
+    {dict:"食べる", english:"to eat", masu:"食べます", te:"食べて"},
+    {dict:"飲む", english:"to drink", masu:"飲みます", te:"飲んで"},
+    {dict:"見る", english:"to see / watch", masu:"見ます", te:"見て"},
+    {dict:"行く", english:"to go", masu:"行きます", te:"行って"},
+    {dict:"話す", english:"to speak", masu:"話します", te:"話して"}
+  ];
+
+  // ---------- State ----------
+  var state = {
+    words: [],
+    weights: {},           // word.dict -> weight (higher = shown more often)
+    mode: "mixed",
+    current: null,          // current question object
+    xp: 0,
+    level: 1,
+    streak: 0,
+    best: 0,
+    correct: 0,
+    answered: 0,
+    usingFallback: false
+  };
+
+  var els = {
+    card: document.getElementById("card"),
+    syncNote: document.getElementById("syncNote"),
+    refreshBtn: document.getElementById("refreshBtn"),
+    statLevel: document.getElementById("statLevel"),
+    statStreak: document.getElementById("statStreak"),
+    statBest: document.getElementById("statBest"),
+    statAcc: document.getElementById("statAcc"),
+    xpBar: document.getElementById("xpBar"),
+    xpLabel: document.getElementById("xpLabel"),
+    modeSelector: document.getElementById("modeSelector")
+  };
+
+  // ---------- Loading vocab from the local vocab-data.js file ----------
+  function loadVocab(){
+    els.syncNote.textContent = "Loading vocab…";
+    els.syncNote.classList.remove("err");
+    state.usingFallback = false;
+
+    var words = (window.VOCAB_WORDS || []).filter(function(w){ return w && w.dict && w.english; });
+    if (!words.length){
+      useFallback("vocab-data.js not found or empty.");
+      return;
+    }
+    state.words = words;
+    words.forEach(function(w){ if(!(w.dict in state.weights)) state.weights[w.dict] = 3; });
+    els.syncNote.textContent = "Loaded " + words.length + " word" + (words.length===1?"":"s") + " from vocab-data.js";
+    startRound();
+  }
+
+  function useFallback(reason){
+    state.usingFallback = true;
+    state.words = FALLBACK_WORDS.slice();
+    state.words.forEach(function(w){ if(!(w.dict in state.weights)) state.weights[w.dict] = 3; });
+    els.syncNote.textContent = "⚠ " + reason + " Practicing with 5 sample verbs for now.";
+    els.syncNote.classList.add("err");
+    startRound();
+  }
+
+  // ---------- Weighted word picker (wrong / new words show up more often) ----------
+  function pickWord(excludeDict){
+    var pool = state.words.filter(function(w){ return w.dict !== excludeDict; });
+    if (!pool.length) pool = state.words;
+    var total = 0;
+    pool.forEach(function(w){ total += (state.weights[w.dict] || 1); });
+    var r = Math.random() * total;
+    for (var i=0;i<pool.length;i++){
+      r -= (state.weights[pool[i].dict] || 1);
+      if (r <= 0) return pool[i];
+    }
+    return pool[pool.length-1];
+  }
+
+  function bump(word, wasCorrect){
+    var w = state.weights[word.dict] || 3;
+    state.weights[word.dict] = wasCorrect ? Math.max(1, w-1) : Math.min(12, w+3);
+  }
+
+  // ---------- Question construction ----------
+  var PROMPT_TYPES_MC = ["dict2eng","eng2dict","dict2masu","dict2te"];
+
+  function startRound(){
+    if (state.words.length < 1){ useFallback("No vocab available yet."); return; }
+    var word = pickWord(state.current ? state.current.word.dict : null);
+    var mode = state.mode;
+    if (mode === "mixed") mode = Math.random() < 0.65 ? "mc" : "type";
+    if (mode === "mc" && state.words.length < 4) mode = "type"; // need enough words for distractors
+
+    if (mode === "mc") renderMC(word);
+    else renderType(word);
+  }
+
+  function renderMC(word){
+    var type = PROMPT_TYPES_MC[Math.floor(Math.random()*PROMPT_TYPES_MC.length)];
+    var promptText, promptLabel, correctAnswer, pool;
+    if (type === "dict2eng"){
+      promptLabel = "What does this verb mean?"; promptText = word.dict;
+      correctAnswer = word.english; pool = state.words.map(function(w){return w.english;});
+    } else if (type === "eng2dict"){
+      promptLabel = "Which verb means this?"; promptText = word.english;
+      correctAnswer = word.dict; pool = state.words.map(function(w){return w.dict;});
+    } else if (type === "dict2masu"){
+      promptLabel = "Masu form of " + word.dict + " (" + word.english + ")?"; promptText = word.dict;
+      correctAnswer = word.masu; pool = state.words.map(function(w){return w.masu;}).filter(Boolean);
+    } else {
+      promptLabel = "Te form of " + word.dict + " (" + word.english + ")?"; promptText = word.dict;
+      correctAnswer = word.te; pool = state.words.map(function(w){return w.te;}).filter(Boolean);
+    }
+    if (!correctAnswer || pool.length < 4){ renderType(word); return; }
+
+    var distractors = shuffle(pool.filter(function(a){return a !== correctAnswer;})).slice(0,3);
+    while (distractors.length < 3) distractors.push(correctAnswer); // safety net, shouldn't normally trigger
+    var options = shuffle([correctAnswer].concat(distractors));
+
+    state.current = {mode:"mc", word:word, type:type, correctAnswer:correctAnswer};
+
+    var html = '<div class="badge">Multiple Choice</div>';
+    html += '<div class="prompt-label">' + escapeHtml(promptLabel) + '</div>';
+    html += '<div class="prompt-word">' + escapeHtml(promptText) + '</div>';
+    html += '<div class="choices">';
+    options.forEach(function(opt){
+      html += '<button class="choice-btn" data-val="' + escapeAttr(opt) + '">' + escapeHtml(opt) + '</button>';
+    });
+    html += '</div>';
+    els.card.innerHTML = html;
+
+    Array.prototype.forEach.call(els.card.querySelectorAll(".choice-btn"), function(btn){
+      btn.addEventListener("click", function(){ handleMCAnswer(btn, options); });
+    });
+  }
+
+  function handleMCAnswer(btn, allOptionEls){
+    var buttons = els.card.querySelectorAll(".choice-btn");
+    Array.prototype.forEach.call(buttons, function(b){ b.disabled = true; });
+    var chosen = btn.getAttribute("data-val");
+    var correct = state.current.correctAnswer;
+    var wasCorrect = chosen === correct;
+    Array.prototype.forEach.call(buttons, function(b){
+      var v = b.getAttribute("data-val");
+      if (v === correct) b.classList.add("correct");
+      else if (b === btn) b.classList.add("wrong");
+      else b.classList.add("dim");
+    });
+    registerAnswer(wasCorrect);
+    setTimeout(nextButtonRow, wasCorrect ? 650 : 1400);
+  }
+
+  function renderType(word){
+    var askTe = Math.random() < 0.5;
+    var target = askTe ? word.te : word.masu;
+    var label = askTe ? "Te form" : "Masu form";
+    if (!target){ // this word has no data for that field, fall back to the other
+      askTe = !askTe; target = askTe ? word.te : word.masu; label = askTe ? "Te form" : "Masu form";
+    }
+    if (!target){ renderMC(word); return; } // neither field present, bail to MC
+
+    state.current = {mode:"type", word:word, correctAnswer:target};
+
+    var html = '<div class="badge">Typing Recall</div>';
+    html += '<div class="prompt-label">Type the ' + label + '</div>';
+    html += '<div class="prompt-word">' + escapeHtml(word.dict) + '</div>';
+    html += '<div class="prompt-sub">' + escapeHtml(word.english) + '</div>';
+    html += '<form class="type-form" id="typeForm">';
+    html += '<input class="type-input" id="typeInput" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="answer in Japanese">';
+    html += '<div class="type-actions"><button type="submit" class="primary-btn">Check</button></div>';
+    html += '<div class="feedback-line" id="typeFeedback"></div>';
+    html += '</form>';
+    els.card.innerHTML = html;
+
+    var input = document.getElementById("typeInput");
+    input.focus();
+    document.getElementById("typeForm").addEventListener("submit", function(e){
+      e.preventDefault();
+      submitType(input.value);
+    });
+  }
+
+  function submitType(value){
+    var input = document.getElementById("typeInput");
+    var feedback = document.getElementById("typeFeedback");
+    if (input.disabled) return;
+    input.disabled = true;
+    var clean = (value||"").trim();
+    var correct = state.current.correctAnswer;
+    var wasCorrect = clean === correct;
+    if (wasCorrect){
+      feedback.textContent = "✓ Correct!";
+      feedback.className = "feedback-line good";
+    } else {
+      feedback.textContent = "✗ Correct answer: " + correct;
+      feedback.className = "feedback-line bad";
+    }
+    registerAnswer(wasCorrect);
+    setTimeout(nextButtonRow, wasCorrect ? 700 : 1800);
+  }
+
+  function nextButtonRow(){ startRound(); }
+
+  // ---------- Scoring ----------
+  function registerAnswer(wasCorrect){
+    bump(state.current.word, wasCorrect);
+    state.answered++;
+    if (wasCorrect){
+      state.correct++;
+      state.streak++;
+      state.best = Math.max(state.best, state.streak);
+      var bonus = Math.floor(state.streak/5) * 5;
+      state.xp += 10 + bonus;
+    } else {
+      state.streak = 0;
+    }
+    var newLevel = Math.floor(state.xp/50) + 1;
+    state.level = newLevel;
+    renderStats();
+  }
+
+  function renderStats(){
+    els.statLevel.textContent = state.level;
+    els.statStreak.textContent = state.streak + " 🔥";
+    els.statBest.textContent = state.best;
+    els.statAcc.textContent = state.answered ? Math.round(100*state.correct/state.answered) + "%" : "—";
+    var xpIntoLevel = state.xp % 50;
+    els.xpBar.style.width = (xpIntoLevel/50*100) + "%";
+    els.xpLabel.textContent = xpIntoLevel + " / 50 XP";
+  }
+
+  // ---------- Helpers ----------
+  function shuffle(arr){
+    var a = arr.slice();
+    for (var i=a.length-1;i>0;i--){
+      var j = Math.floor(Math.random()*(i+1));
+      var t=a[i]; a[i]=a[j]; a[j]=t;
+    }
+    return a;
+  }
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, function(c){
+      return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];
+    });
+  }
+  function escapeAttr(s){ return escapeHtml(s).replace(/"/g,"&quot;"); }
+
+  // ---------- Mode selector ----------
+  els.modeSelector.addEventListener("click", function(e){
+    var btn = e.target.closest(".mode-btn");
+    if (!btn) return;
+    Array.prototype.forEach.call(els.modeSelector.querySelectorAll(".mode-btn"), function(b){ b.classList.remove("active"); });
+    btn.classList.add("active");
+    state.mode = btn.getAttribute("data-mode");
+    startRound();
+  });
+
+  els.refreshBtn.addEventListener("click", function(){
+    els.card.innerHTML = '<div class="state-box"><div class="spinner"></div><div>Refreshing from your sheet…</div></div>';
+    loadVocab();
+  });
+
+  renderStats();
+  loadVocab();
+})();
+</script>
+</body>
+</html>
