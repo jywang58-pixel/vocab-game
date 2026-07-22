@@ -82,6 +82,10 @@
     position:absolute; top:14px; left:14px; font-size:11px; color:var(--ink-soft);
     background:var(--bg-2); padding:4px 10px; border-radius:99px; border:1px solid var(--line);
   }
+  .card .badge-group{
+    position:absolute; top:14px; right:14px; font-size:11px; color:var(--accent-dark);
+    background:var(--accent-soft); padding:4px 10px; border-radius:99px; border:1px solid var(--accent-soft);
+  }
   .prompt-label{ font-size:12px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:10px;}
   .prompt-word{ font-size:38px; font-weight:700; margin-bottom:4px; word-break:break-word; }
   .prompt-sub{ font-size:14px; color:var(--ink-soft); margin-bottom:22px; }
@@ -311,6 +315,7 @@
     state.current = {mode:"mc", word:word, type:type, correctAnswer:correctAnswer};
 
     var html = '<div class="badge">Multiple Choice</div>';
+    if (word.group) html += '<div class="badge-group">' + escapeHtml(groupLabel(word.group)) + '</div>';
     html += '<div class="prompt-label">' + escapeHtml(promptLabel) + '</div>';
     html += '<div class="prompt-word">' + escapeHtml(promptText) + '</div>';
     html += '<div class="choices">';
@@ -353,6 +358,7 @@
     state.current = {mode:"type", word:word, correctAnswer:target};
 
     var html = '<div class="badge">Typing Recall</div>';
+    if (word.group) html += '<div class="badge-group">' + escapeHtml(groupLabel(word.group)) + '</div>';
     html += '<div class="prompt-label">Type the ' + label + '</div>';
     html += '<div class="prompt-word">' + escapeHtml(word.dict) + '</div>';
     html += '<div class="prompt-sub">' + escapeHtml(word.english) + '</div>';
@@ -435,6 +441,12 @@
     });
   }
   function escapeAttr(s){ return escapeHtml(s).replace(/"/g,"&quot;"); }
+  function groupLabel(g){
+    if (g === 1) return "Group 1 · う-verb";
+    if (g === 2) return "Group 2 · る-verb";
+    if (g === 3) return "Group 3 · irregular";
+    return "";
+  }
 
   // ---------- Mode selector ----------
   els.modeSelector.addEventListener("click", function(e){
