@@ -97,6 +97,7 @@
     border:1.5px solid var(--line); background:#fffefb; border-radius:14px;
     padding:14px 10px; font-size:16px; cursor:pointer; color:var(--ink);
     transition:all .12s ease;
+    -webkit-tap-highlight-color: transparent;
   }
   .choice-btn:hover{ border-color:var(--accent-soft); background:#fff7f2; }
   .choice-btn.correct{ background:var(--good-bg); border-color:var(--good); color:var(--good); font-weight:700; }
@@ -349,7 +350,7 @@
       else b.classList.add("dim");
     });
     registerAnswer(wasCorrect);
-    setTimeout(nextButtonRow, wasCorrect ? 650 : 1400);
+    setTimeout(nextButtonRow, wasCorrect ? 1000 : 2400);
   }
 
   function renderType(word){
@@ -400,7 +401,7 @@
       feedback.className = "feedback-line bad";
     }
     registerAnswer(wasCorrect);
-    setTimeout(nextButtonRow, wasCorrect ? 700 : 1800);
+    setTimeout(nextButtonRow, wasCorrect ? 1000 : 2800);
   }
 
   function nextButtonRow(){ startRound(); }
