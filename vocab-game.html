@@ -89,15 +89,17 @@
     background:var(--accent-soft); padding:4px 10px; border-radius:99px; border:1px solid var(--accent-soft);
   }
   .prompt-label{ font-size:12px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:10px;}
-  .prompt-word{ font-size:38px; font-weight:700; margin-bottom:4px; word-break:break-word; }
+  .prompt-word{ font-size:28px; font-weight:700; margin-bottom:4px; word-break:break-word; padding-top:8px; }
   .prompt-sub{ font-size:14px; color:var(--ink-soft); margin-bottom:22px; }
+  ruby rt{ font-size:0.45em; color:var(--ink-soft); font-weight:400; user-select:none; }
+  .app.hide-furigana rt{ display:none; }
 
   .choices{ display:grid; grid-template-columns:1fr 1fr; gap:10px; width:100%; }
   .choice-btn{
-    border:1.5px solid var(--line); background:#fffefb; border-radius:14px;
-    padding:14px 10px; font-size:16px; cursor:pointer; color:var(--ink);
-    transition:all .12s ease;
     -webkit-tap-highlight-color: transparent;
+    border:1.5px solid var(--line); background:#fffefb; border-radius:14px;
+    padding:14px 10px; font-size:20px; cursor:pointer; color:var(--ink);
+    transition:all .12s ease;
   }
   .choice-btn:hover{ border-color:var(--accent-soft); background:#fff7f2; }
   .choice-btn.correct{ background:var(--good-bg); border-color:var(--good); color:var(--good); font-weight:700; }
@@ -127,6 +129,7 @@
   .ghost-btn:hover{ border-color:var(--accent-soft); color:var(--ink); }
 
   .toolbar{ display:flex; justify-content:space-between; align-items:center; margin-top:16px; flex-wrap:wrap; gap:10px; }
+  .toolbar-actions{ display:flex; align-items:center; gap:14px; }
   .sync-note{ font-size:12px; color:var(--ink-soft); }
   .sync-note.err{ color:var(--bad); }
   .link-btn{ background:none; border:none; color:var(--accent); font-size:12px; cursor:pointer; text-decoration:underline; padding:0; }
@@ -152,7 +155,7 @@
 </style>
 </head>
 <body>
-<div class="app">
+<div class="app" id="app">
 
   <header class="top">
     <div class="brand">
@@ -191,7 +194,10 @@
 
   <div class="toolbar">
     <span class="sync-note" id="syncNote">Loading vocab…</span>
-    <button class="link-btn" id="refreshBtn">↻ Reload vocab</button>
+    <div class="toolbar-actions">
+      <button class="link-btn" id="furiganaToggle">ふりがな: On</button>
+      <button class="link-btn" id="refreshBtn">↻ Reload vocab</button>
+    </div>
   </div>
 
   <footer>Built for Sarah's Japanese vocab practice · words load from vocab-data.js in this folder</footer>
@@ -221,13 +227,17 @@
     best: 0,
     correct: 0,
     answered: 0,
-    usingFallback: false
+    usingFallback: false,
+    showFurigana: true,
+    dictToHiragana: {}
   };
 
   var els = {
+    app: document.getElementById("app"),
     card: document.getElementById("card"),
     syncNote: document.getElementById("syncNote"),
     refreshBtn: document.getElementById("refreshBtn"),
+    furiganaToggle: document.getElementById("furiganaToggle"),
     statLevel: document.getElementById("statLevel"),
     statStreak: document.getElementById("statStreak"),
     statBest: document.getElementById("statBest"),
@@ -249,7 +259,10 @@
       return;
     }
     state.words = words;
-    words.forEach(function(w){ if(!(w.dict in state.weights)) state.weights[w.dict] = 3; });
+    words.forEach(function(w){
+      if(!(w.dict in state.weights)) state.weights[w.dict] = 3;
+      state.dictToHiragana[w.dict] = w.hiragana || "";
+    });
     els.syncNote.textContent = "Loaded " + words.length + " word" + (words.length===1?"":"s") + " from vocab-data.js";
     startRound();
   }
@@ -257,7 +270,10 @@
   function useFallback(reason){
     state.usingFallback = true;
     state.words = FALLBACK_WORDS.slice();
-    state.words.forEach(function(w){ if(!(w.dict in state.weights)) state.weights[w.dict] = 3; });
+    state.words.forEach(function(w){
+      if(!(w.dict in state.weights)) state.weights[w.dict] = 3;
+      state.dictToHiragana[w.dict] = w.hiragana || "";
+    });
     els.syncNote.textContent = "⚠ " + reason + " Practicing with 5 sample verbs for now.";
     els.syncNote.classList.add("err");
     startRound();
@@ -320,14 +336,17 @@
 
     state.current = {mode:"mc", word:word, type:type, correctAnswer:correctAnswer};
 
+    var promptIsDict = (type !== "eng2dict");
+
     var html = '<div class="card-top"><div class="badge">Multiple Choice</div>';
     html += word.group ? ('<div class="badge-group">' + escapeHtml(groupLabel(word.group)) + '</div>') : '<div></div>';
     html += '</div><div class="card-body">';
     html += '<div class="prompt-label">' + escapeHtml(promptLabel) + '</div>';
-    html += '<div class="prompt-word">' + escapeHtml(promptText) + '</div>';
+    html += '<div class="prompt-word">' + (promptIsDict ? furiganaHtml(promptText, word.hiragana) : escapeHtml(promptText)) + '</div>';
     html += '<div class="choices">';
     options.forEach(function(opt){
-      html += '<button class="choice-btn" data-val="' + escapeAttr(opt) + '">' + escapeHtml(opt) + '</button>';
+      var label = (type === "eng2dict") ? furiganaHtml(opt, state.dictToHiragana[opt]) : escapeHtml(opt);
+      html += '<button class="choice-btn" data-val="' + escapeAttr(opt) + '">' + label + '</button>';
     });
     html += '</div></div>';
     els.card.innerHTML = html;
@@ -350,7 +369,7 @@
       else b.classList.add("dim");
     });
     registerAnswer(wasCorrect);
-    setTimeout(nextButtonRow, wasCorrect ? 1000 : 2400);
+    setTimeout(nextButtonRow, wasCorrect ? 650 : 1400);
   }
 
   function renderType(word){
@@ -368,7 +387,7 @@
     html += word.group ? ('<div class="badge-group">' + escapeHtml(groupLabel(word.group)) + '</div>') : '<div></div>';
     html += '</div><div class="card-body">';
     html += '<div class="prompt-label">Type the ' + label + '</div>';
-    html += '<div class="prompt-word">' + escapeHtml(word.dict) + '</div>';
+    html += '<div class="prompt-word">' + furiganaHtml(word.dict, word.hiragana) + '</div>';
     html += '<div class="prompt-sub">' + escapeHtml(word.english) + '</div>';
     html += '<form class="type-form" id="typeForm">';
     html += '<input class="type-input" id="typeInput" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="answer in Japanese">';
@@ -401,7 +420,7 @@
       feedback.className = "feedback-line bad";
     }
     registerAnswer(wasCorrect);
-    setTimeout(nextButtonRow, wasCorrect ? 1000 : 2800);
+    setTimeout(nextButtonRow, wasCorrect ? 700 : 1800);
   }
 
   function nextButtonRow(){ startRound(); }
@@ -449,6 +468,11 @@
     });
   }
   function escapeAttr(s){ return escapeHtml(s).replace(/"/g,"&quot;"); }
+  function furiganaHtml(text, reading){
+    var safeText = escapeHtml(text);
+    if (!reading || reading === text) return safeText;
+    return '<ruby>' + safeText + '<rt>' + escapeHtml(reading) + '</rt></ruby>';
+  }
   function groupLabel(g){
     if (g === 1) return "Group 1 · う-verb";
     if (g === 2) return "Group 2 · る-verb";
@@ -464,6 +488,12 @@
     btn.classList.add("active");
     state.mode = btn.getAttribute("data-mode");
     startRound();
+  });
+
+  els.furiganaToggle.addEventListener("click", function(){
+    state.showFurigana = !state.showFurigana;
+    els.app.classList.toggle("hide-furigana", !state.showFurigana);
+    els.furiganaToggle.textContent = "ふりがな: " + (state.showFurigana ? "On" : "Off");
   });
 
   els.refreshBtn.addEventListener("click", function(){
