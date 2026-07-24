@@ -58,5 +58,22 @@ window.VOCAB_WORDS = [
   {dict:"乗せる", english:"to put (an object) on", masu:"乗せます", te:"乗せて", group:2},
   {dict:"たずねる", english:"to ask", masu:"たずねます", te:"たずねて", group:2},
   {dict:"持っていく", english:"to take (things)", masu:"持っていきます", te:"持っていって", group:1},
-  {dict:"連れていく", english:"to take (person / animal)", masu:"連れていきます", te:"連れていって", group:1}
+  {dict:"連れていく", english:"to take (person / animal)", masu:"連れていきます", te:"連れていって", group:1},
+  {dict:"変える", english:"to change (something)", masu:"変えます", te:"変えて", group:2},
+  {dict:"弾く", english:"to play (a stringed instrument or piano)", masu:"弾きます", te:"弾いて", group:1},
+  {dict:"集める", english:"to collect / to gather", masu:"集めます", te:"集めて", group:2},
+  {dict:"動かす", english:"to move (something)", masu:"動かします", te:"動かして", group:1},
+  {dict:"辞める", english:"to quit (a job)", masu:"辞めます", te:"辞めて", group:2},
+  {dict:"別れる", english:"to separate / to break up (with someone)", masu:"別れます", te:"別れて", group:2},
+  {dict:"始まる", english:"to begin (intransitive)", masu:"始まります", te:"始まって", group:1},
+  {dict:"死ぬ", english:"to die", masu:"死にます", te:"死んで", group:1},
+  {dict:"入れる", english:"to put in / to insert", masu:"入れます", te:"入れて", group:2},
+  {dict:"片付ける", english:"to tidy up / to put away", masu:"片付けます", te:"片付けて", group:2},
+  {dict:"選ぶ", english:"to choose / to select", masu:"選びます", te:"選んで", group:1},
+  {dict:"迎える", english:"to welcome / to pick up (someone)", masu:"迎えます", te:"迎えて", group:2},
+  {dict:"出す", english:"to take out / to submit", masu:"出します", te:"出して", group:1},
+  {dict:"磨く", english:"to brush (teeth) / to polish", masu:"磨きます", te:"磨いて", group:1},
+  {dict:"出る", english:"to leave / to exit / to attend", masu:"出ます", te:"出て", group:2},
+  {dict:"卒業する", english:"to graduate", masu:"卒業します", te:"卒業して", group:3},
+  {dict:"結婚する", english:"to marry", masu:"結婚します", te:"結婚して", group:3}
 ];
