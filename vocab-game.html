@@ -238,8 +238,17 @@
     answered: 0,
     usingFallback: false,
     showFurigana: true,
-    dictToHiragana: {}
+    dictToHiragana: {},
+    bgStarted: false
   };
+
+  var sounds = {
+    rain: new Audio("bg-rain.wav"),
+    wrong: new Audio("wrong-answer.wav")
+  };
+  sounds.rain.loop = true;
+  sounds.rain.volume = 0.25;
+  sounds.wrong.volume = 0.7;
 
   var els = {
     app: document.getElementById("app"),
@@ -436,6 +445,14 @@
 
   // ---------- Scoring ----------
   function registerAnswer(wasCorrect){
+    if (!state.bgStarted){
+      state.bgStarted = true;
+      sounds.rain.play().catch(function(){});
+    }
+    if (!wasCorrect){
+      sounds.wrong.currentTime = 0;
+      sounds.wrong.play().catch(function(){});
+    }
     bump(state.current.word, wasCorrect);
     state.answered++;
     if (wasCorrect){
