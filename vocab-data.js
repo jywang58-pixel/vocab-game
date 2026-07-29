@@ -76,5 +76,10 @@ window.VOCAB_WORDS = [
   {dict:"磨く", english:"to brush (teeth) / to polish", masu:"磨きます", te:"磨いて", group:1, hiragana:"みがく"},
   {dict:"出る", english:"to leave / to exit / to attend", masu:"出ます", te:"出て", group:2, hiragana:"でる"},
   {dict:"卒業する", english:"to graduate", masu:"卒業します", te:"卒業して", group:3, hiragana:"そつぎょうする"},
-  {dict:"結婚する", english:"to marry", masu:"結婚します", te:"結婚して", group:3, hiragana:"けっこんする"}
+  {dict:"結婚する", english:"to marry", masu:"結婚します", te:"結婚して", group:3, hiragana:"けっこんする"},
+  {dict:"覚える", english:"to remember / to memorize", masu:"覚えます", te:"覚えて", group:2, hiragana:"おぼえる"},
+  {dict:"掃除する", english:"to clean", masu:"掃除します", te:"掃除して", group:3, hiragana:"そうじする"},
+  {dict:"洗濯する", english:"to do laundry", masu:"洗濯します", te:"洗濯して", group:3, hiragana:"せんたくする"},
+  {dict:"誘う", english:"to invite", masu:"誘います", te:"誘って", group:1, hiragana:"さそう"},
+  {dict:"頼む", english:"to ask / to request", masu:"頼みます", te:"頼んで", group:1, hiragana:"たのむ"}
 ];

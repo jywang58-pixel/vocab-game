@@ -238,48 +238,15 @@
     answered: 0,
     usingFallback: false,
     showFurigana: true,
-    dictToHiragana: {},
-    bgStarted: false
+    dictToHiragana: {}
   };
 
   var sounds = {
+    correct: new Audio("right-answer.wav"),
     wrong: new Audio("wrong-answer.wav")
   };
+  sounds.correct.volume = 0.5;
   sounds.wrong.volume = 0.7;
-
-  // Web Audio API used for the rain loop specifically: HTMLAudioElement's
-  // native loop attribute re-seeks/re-buffers on restart and audibly glitches,
-  // even with perfectly seamless source audio. AudioBufferSourceNode loops
-  // at the exact sample boundary with no gap.
-  var audioCtx = null;
-  var rainBuffer = null;
-  var rainSource = null;
-  (function initRain(){
-    try {
-      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      fetch("bg-rain.wav")
-        .then(function(r){ return r.arrayBuffer(); })
-        .then(function(buf){ return audioCtx.decodeAudioData(buf); })
-        .then(function(decoded){
-          rainBuffer = decoded;
-          if (state.bgStarted) startRain(); // user already answered before decode finished
-        })
-        .catch(function(){});
-    } catch(e){}
-  })();
-
-  function startRain(){
-    if (!audioCtx || !rainBuffer || rainSource) return;
-    if (audioCtx.state === "suspended") audioCtx.resume();
-    var source = audioCtx.createBufferSource();
-    source.buffer = rainBuffer;
-    source.loop = true;
-    var gain = audioCtx.createGain();
-    gain.gain.value = 0.25;
-    source.connect(gain).connect(audioCtx.destination);
-    source.start(0);
-    rainSource = source;
-  }
 
   var els = {
     app: document.getElementById("app"),
@@ -418,7 +385,7 @@
       else b.classList.add("dim");
     });
     registerAnswer(wasCorrect);
-    setTimeout(nextButtonRow, wasCorrect ? 650 : 1400);
+    setTimeout(nextButtonRow, wasCorrect ? 650 : 2800);
   }
 
   function renderType(word){
@@ -469,20 +436,19 @@
       feedback.className = "feedback-line bad";
     }
     registerAnswer(wasCorrect);
-    setTimeout(nextButtonRow, wasCorrect ? 700 : 1800);
+    setTimeout(nextButtonRow, wasCorrect ? 700 : 2800);
   }
 
   function nextButtonRow(){ startRound(); }
 
   // ---------- Scoring ----------
   function registerAnswer(wasCorrect){
-    if (!state.bgStarted){
-      state.bgStarted = true;
-      startRain();
-    }
     if (!wasCorrect){
       sounds.wrong.currentTime = 0;
       sounds.wrong.play().catch(function(){});
+    } else {
+      sounds.correct.currentTime = 0;
+      sounds.correct.play().catch(function(){});
     }
     bump(state.current.word, wasCorrect);
     state.answered++;
