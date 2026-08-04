@@ -403,9 +403,10 @@
 
     var promptIsDict = (type !== "eng2dict");
 
-    var html = '<div class="card-top"><div class="badge">Multiple Choice</div><div class="badge-cluster">';
+    var html = '<div class="card-top">';
+    html += isNewWord(word) ? '<div class="badge-new">✨ New</div>' : '<div></div>';
+    html += '<div class="badge-cluster">';
     html += word.group ? ('<div class="badge-group">' + escapeHtml(groupLabel(word.group)) + '</div>') : '';
-    html += isNewWord(word) ? '<div class="badge-new">✨ New</div>' : '';
     html += '</div></div><div class="card-body">';
     html += '<div class="prompt-label">' + escapeHtml(promptLabel) + '</div>';
     html += '<div class="prompt-word">' + (promptIsDict ? furiganaHtml(promptText, word.hiragana) : escapeHtml(promptText)) + '</div>';
@@ -449,9 +450,10 @@
 
     state.current = {mode:"type", word:word, correctAnswer:target};
 
-    var html = '<div class="card-top"><div class="badge">Typing Recall</div><div class="badge-cluster">';
+    var html = '<div class="card-top">';
+    html += isNewWord(word) ? '<div class="badge-new">✨ New</div>' : '<div></div>';
+    html += '<div class="badge-cluster">';
     html += word.group ? ('<div class="badge-group">' + escapeHtml(groupLabel(word.group)) + '</div>') : '';
-    html += isNewWord(word) ? '<div class="badge-new">✨ New</div>' : '';
     html += '</div></div><div class="card-body">';
     html += '<div class="prompt-label">Type the ' + label + '</div>';
     html += '<div class="prompt-word">' + furiganaHtml(word.dict, word.hiragana) + '</div>';
