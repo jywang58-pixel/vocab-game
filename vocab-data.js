@@ -81,5 +81,8 @@ window.VOCAB_WORDS = [
   {dict:"掃除する", english:"to clean", masu:"掃除します", te:"掃除して", group:3, hiragana:"そうじする"},
   {dict:"洗濯する", english:"to do laundry", masu:"洗濯します", te:"洗濯して", group:3, hiragana:"せんたくする"},
   {dict:"誘う", english:"to invite", masu:"誘います", te:"誘って", group:1, hiragana:"さそう"},
-  {dict:"頼む", english:"to ask / to request", masu:"頼みます", te:"頼んで", group:1, hiragana:"たのむ"}
+  {dict:"頼む", english:"to ask / to request", masu:"頼みます", te:"頼んで", group:1, hiragana:"たのむ"},
+  {dict:"務める", english:"to serve (in a role) / to hold a post", masu:"務めます", te:"務めて", group:2, hiragana:"つとめる"},
+  {dict:"通う", english:"to commute / to attend regularly", masu:"通います", te:"通って", group:1, hiragana:"かよう"},
+  {dict:"知る", english:"to know / to get to know", masu:"知ります", te:"知って", group:1, hiragana:"しる"}
 ];

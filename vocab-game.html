@@ -97,6 +97,11 @@
     font-size:13px; color:var(--accent-dark);
     background:var(--accent-soft); padding:4px 10px; border-radius:99px; border:1px solid var(--accent-soft);
   }
+  .badge-cluster{ display:flex; gap:6px; align-items:center; flex-wrap:wrap; justify-content:flex-end; }
+  .card .badge-new{
+    font-size:13px; color:#8a6d00; font-weight:600;
+    background:#fff3c4; padding:4px 10px; border-radius:99px; border:1px solid #f0dfa0;
+  }
   .prompt-label{ font-size:14px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:10px;}
   .prompt-word{ font-size:34px; font-weight:700; margin-bottom:4px; word-break:break-word; padding-top:8px; }
   .prompt-sub{ font-size:16px; color:var(--ink-soft); margin-bottom:22px; }
@@ -224,6 +229,26 @@
     {dict:"話す", english:"to speak", masu:"話します", te:"話して"}
   ];
 
+  // ---------- New-word prioritization ----------
+  // Words the learner hasn't "graduated" past yet get a much higher pick weight so they
+  // surface more often, plus a small "New" badge. A word graduates (goes back to normal
+  // weighting) once it's been answered correctly NEW_WORD_MASTERY times. Graduated words
+  // are remembered in localStorage so this persists across sessions/days.
+  var STORAGE_KEY = "verbDojoKnownWords_v1";
+  var NEW_WORD_WEIGHT = 9;
+  var NEW_WORD_MASTERY = 2;
+
+  function loadKnownWords(){
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY);
+      var arr = raw ? JSON.parse(raw) : [];
+      return Array.isArray(arr) ? arr : [];
+    } catch(e){ return []; }
+  }
+  function saveKnownWords(arr){
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(arr)); } catch(e){ /* ignore (private mode, etc.) */ }
+  }
+
   // ---------- State ----------
   var state = {
     words: [],
@@ -238,7 +263,9 @@
     answered: 0,
     usingFallback: false,
     showFurigana: true,
-    dictToHiragana: {}
+    dictToHiragana: {},
+    knownWords: {},         // dict -> true, words that have graduated past "new" status
+    newCorrectCounts: {}    // dict -> correct answers so far while still marked new
   };
 
   var sounds = {
@@ -263,6 +290,33 @@
     modeSelector: document.getElementById("modeSelector")
   };
 
+  // Sets up weights/hiragana lookup/new-word status for a word list. Returns how many
+  // words were detected as "new" (not yet graduated per localStorage).
+  function initWordsState(words){
+    var knownArr = loadKnownWords();
+    var knownSet = {};
+    knownArr.forEach(function(d){ knownSet[d] = true; });
+    state.knownWords = knownSet;
+
+    var newCount = 0;
+    words.forEach(function(w){
+      var isNew = !knownSet[w.dict];
+      if (isNew) newCount++;
+      if (!(w.dict in state.weights)) state.weights[w.dict] = isNew ? NEW_WORD_WEIGHT : 3;
+      state.dictToHiragana[w.dict] = w.hiragana || "";
+    });
+    return newCount;
+  }
+
+  function isNewWord(word){ return !state.knownWords[word.dict]; }
+
+  function graduateWord(word){
+    if (state.knownWords[word.dict]) return;
+    state.knownWords[word.dict] = true;
+    state.weights[word.dict] = 3; // back to normal priority now that it's learned
+    saveKnownWords(Object.keys(state.knownWords));
+  }
+
   // ---------- Loading vocab from the local vocab-data.js file ----------
   function loadVocab(){
     els.syncNote.textContent = "Loading vocab…";
@@ -275,21 +329,16 @@
       return;
     }
     state.words = words;
-    words.forEach(function(w){
-      if(!(w.dict in state.weights)) state.weights[w.dict] = 3;
-      state.dictToHiragana[w.dict] = w.hiragana || "";
-    });
-    els.syncNote.textContent = "Loaded " + words.length + " word" + (words.length===1?"":"s") + " from vocab-data.js";
+    var newCount = initWordsState(words);
+    els.syncNote.textContent = "Loaded " + words.length + " word" + (words.length===1?"":"s") + " from vocab-data.js" +
+      (newCount ? " · " + newCount + " new ✨ (prioritized)" : "");
     startRound();
   }
 
   function useFallback(reason){
     state.usingFallback = true;
     state.words = FALLBACK_WORDS.slice();
-    state.words.forEach(function(w){
-      if(!(w.dict in state.weights)) state.weights[w.dict] = 3;
-      state.dictToHiragana[w.dict] = w.hiragana || "";
-    });
+    initWordsState(state.words);
     els.syncNote.textContent = "⚠ " + reason + " Practicing with 5 sample verbs for now.";
     els.syncNote.classList.add("err");
     startRound();
@@ -354,9 +403,10 @@
 
     var promptIsDict = (type !== "eng2dict");
 
-    var html = '<div class="card-top"><div class="badge">Multiple Choice</div>';
-    html += word.group ? ('<div class="badge-group">' + escapeHtml(groupLabel(word.group)) + '</div>') : '<div></div>';
-    html += '</div><div class="card-body">';
+    var html = '<div class="card-top"><div class="badge">Multiple Choice</div><div class="badge-cluster">';
+    html += word.group ? ('<div class="badge-group">' + escapeHtml(groupLabel(word.group)) + '</div>') : '';
+    html += isNewWord(word) ? '<div class="badge-new">✨ New</div>' : '';
+    html += '</div></div><div class="card-body">';
     html += '<div class="prompt-label">' + escapeHtml(promptLabel) + '</div>';
     html += '<div class="prompt-word">' + (promptIsDict ? furiganaHtml(promptText, word.hiragana) : escapeHtml(promptText)) + '</div>';
     html += '<div class="choices">';
@@ -399,9 +449,10 @@
 
     state.current = {mode:"type", word:word, correctAnswer:target};
 
-    var html = '<div class="card-top"><div class="badge">Typing Recall</div>';
-    html += word.group ? ('<div class="badge-group">' + escapeHtml(groupLabel(word.group)) + '</div>') : '<div></div>';
-    html += '</div><div class="card-body">';
+    var html = '<div class="card-top"><div class="badge">Typing Recall</div><div class="badge-cluster">';
+    html += word.group ? ('<div class="badge-group">' + escapeHtml(groupLabel(word.group)) + '</div>') : '';
+    html += isNewWord(word) ? '<div class="badge-new">✨ New</div>' : '';
+    html += '</div></div><div class="card-body">';
     html += '<div class="prompt-label">Type the ' + label + '</div>';
     html += '<div class="prompt-word">' + furiganaHtml(word.dict, word.hiragana) + '</div>';
     html += '<div class="prompt-sub">' + escapeHtml(word.english) + '</div>';
@@ -450,7 +501,14 @@
       sounds.correct.currentTime = 0;
       sounds.correct.play().catch(function(){});
     }
-    bump(state.current.word, wasCorrect);
+    var word = state.current.word;
+    bump(word, wasCorrect);
+
+    if (isNewWord(word) && wasCorrect){
+      state.newCorrectCounts[word.dict] = (state.newCorrectCounts[word.dict] || 0) + 1;
+      if (state.newCorrectCounts[word.dict] >= NEW_WORD_MASTERY) graduateWord(word);
+    }
+
     state.answered++;
     if (wasCorrect){
       state.correct++;
