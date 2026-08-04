@@ -258,7 +258,7 @@
     xp: 0,
     level: 1,
     streak: 0,
-    best: 0,
+    best: parseInt(localStorage.getItem("verbDojoBest"), 10) || 0,
     correct: 0,
     answered: 0,
     usingFallback: false,
@@ -514,6 +514,7 @@
       state.correct++;
       state.streak++;
       state.best = Math.max(state.best, state.streak);
+      localStorage.setItem("verbDojoBest", state.best);
       var bonus = Math.floor(state.streak/5) * 5;
       state.xp += 10 + bonus;
     } else {
