@@ -84,5 +84,10 @@ window.VOCAB_WORDS = [
   {dict:"頼む", english:"to ask / to request", masu:"頼みます", te:"頼んで", group:1, hiragana:"たのむ"},
   {dict:"務める", english:"to serve (in a role) / to hold a post", masu:"務めます", te:"務めて", group:2, hiragana:"つとめる"},
   {dict:"通う", english:"to commute / to attend regularly", masu:"通います", te:"通って", group:1, hiragana:"かよう"},
-  {dict:"知る", english:"to know / to get to know", masu:"知ります", te:"知って", group:1, hiragana:"しる"}
+  {dict:"知る", english:"to know / to get to know", masu:"知ります", te:"知って", group:1, hiragana:"しる"},
+  {dict:"注文する", english:"to order (food, a product)", masu:"注文します", te:"注文して", group:3, hiragana:"ちゅうもんする"},
+  {dict:"なおす", english:"to fix / to repair", masu:"なおします", te:"なおして", group:1, hiragana:"なおす"},
+  {dict:"もうしこみする", english:"to apply (for something)", masu:"もうしこみします", te:"もうしこみして", group:3, hiragana:"もうしこみする"},
+  {dict:"きめる", english:"to decide", masu:"きめます", te:"きめて", group:2, hiragana:"きめる"},
+  {dict:"やる", english:"to do (casual)", masu:"やります", te:"やって", group:1, hiragana:"やる"}
 ];

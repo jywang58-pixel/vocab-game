@@ -105,6 +105,7 @@
   .prompt-label{ font-size:14px; color:var(--ink-soft); text-transform:uppercase; letter-spacing:0.06em; margin-bottom:10px;}
   .prompt-word{ font-size:34px; font-weight:700; margin-bottom:4px; word-break:break-word; padding-top:8px; }
   .prompt-sub{ font-size:16px; color:var(--ink-soft); margin-bottom:22px; }
+  .prompt-sentence{ font-size:23px; font-weight:600; line-height:1.4; margin-bottom:22px; padding-top:8px; }
   ruby rt{ font-size:0.68em; color:var(--ink-soft); font-weight:400; user-select:none; }
   .app.hide-furigana rt{ display:none; }
 
@@ -183,6 +184,8 @@
       <button class="mode-btn active" data-mode="mixed">Mixed</button>
       <button class="mode-btn" data-mode="mc">Multiple Choice</button>
       <button class="mode-btn" data-mode="type">Typing</button>
+      <button class="mode-btn" data-mode="pattern">Patterns</button>
+      <button class="mode-btn" data-mode="sentence">Sentences</button>
     </div>
   </header>
 
@@ -218,6 +221,7 @@
 </div>
 
 <script src="vocab-data.js"></script>
+<script src="sentence-data.js"></script>
 <script>
 (function(){
   // ---------- Fallback seed data (used only if vocab-data.js is missing/empty) ----------
@@ -265,7 +269,8 @@
     showFurigana: true,
     dictToHiragana: {},
     knownWords: {},         // dict -> true, words that have graduated past "new" status
-    newCorrectCounts: {}    // dict -> correct answers so far while still marked new
+    newCorrectCounts: {},   // dict -> correct answers so far while still marked new
+    lastSentenceIndex: -1
   };
 
   var sounds = {
@@ -366,10 +371,39 @@
   // ---------- Question construction ----------
   var PROMPT_TYPES_MC = ["dict2eng","eng2dict","dict2masu","dict2te"];
 
+  // Grammar patterns for "choose the right form" practice — same 14 patterns as
+  // sentence-data.js, minus the て-connector (no fixed suffix, doesn't fit this format).
+  var GRAMMAR_PATTERNS = [
+    {name:"のが好きです", form:"dict", suffix:"のが好きです", meaning:"I like doing ~"},
+    {name:"つもりです",   form:"dict", suffix:"つもりです",   meaning:"I plan to / intend to ~"},
+    {name:"前に",         form:"dict", suffix:"前に",         meaning:"before doing ~"},
+    {name:"ましょうか",   form:"stem", suffix:"ましょうか",   meaning:"Shall we ~?"},
+    {name:"ます form",    form:"masu", suffix:"",             meaning:"polite present/future statement"},
+    {name:"たいです",     form:"stem", suffix:"たいです",     meaning:"I want to ~"},
+    {name:"すぎました",   form:"stem", suffix:"すぎました",   meaning:"did too much of ~"},
+    {name:"てください",   form:"te",   suffix:"ください",     meaning:"please do ~"},
+    {name:"ていただけませんか", form:"te", suffix:"いただけませんか", meaning:"could you please ~"},
+    {name:"てもいいですか", form:"te", suffix:"もいいですか", meaning:"may I ~?"},
+    {name:"ています",     form:"te",   suffix:"います",       meaning:"ongoing / habitual action"},
+    {name:"ていました",   form:"te",   suffix:"いました",     meaning:"past progressive"},
+    {name:"まだ〜ていません", form:"te", suffix:"いません", prefix:"まだ", meaning:"haven't done ~ yet"}
+  ];
+
+  function getFormValue(word, formType){
+    if (formType === "dict") return word.dict;
+    if (formType === "masu") return word.masu || null;
+    if (formType === "te") return word.te || null;
+    if (formType === "stem") return word.masu ? word.masu.slice(0, -2) : null; // drop trailing ます
+    return null;
+  }
+
   function startRound(){
     if (state.words.length < 1){ useFallback("No vocab available yet."); return; }
-    var word = pickWord(state.current ? state.current.word.dict : null);
     var mode = state.mode;
+    if (mode === "sentence"){ renderSentence(); return; }
+    if (mode === "pattern"){ renderPattern(); return; }
+
+    var word = pickWord(state.current && state.current.word ? state.current.word.dict : null);
     if (mode === "mixed") mode = Math.random() < 0.65 ? "mc" : "type";
     if (mode === "mc" && state.words.length < 4) mode = "type"; // need enough words for distractors
 
@@ -492,6 +526,102 @@
     setTimeout(nextButtonRow, wasCorrect ? 700 : 2800);
   }
 
+  // ---------- Sentence pattern practice ----------
+  function normalizeJp(s){
+    return String(s||"")
+      .replace(/[　\s]+/g, "")   // strip all spaces (full and half width)
+      .replace(/[。.]+$/, "");        // trailing period is optional
+  }
+
+  function pickSentence(){
+    var bank = window.SENTENCE_PRACTICE || [];
+    if (!bank.length) return null;
+    if (bank.length === 1) return {entry: bank[0], index: 0};
+    var idx;
+    do { idx = Math.floor(Math.random() * bank.length); } while (idx === state.lastSentenceIndex);
+    state.lastSentenceIndex = idx;
+    return {entry: bank[idx], index: idx};
+  }
+
+  function renderSentence(){
+    var picked = pickSentence();
+    if (!picked){ renderType(pickWord(null)); return; } // no sentence bank available, fall back
+
+    state.current = {mode:"sentence", word:null, correctAnswer: picked.entry.jp};
+
+    var html = '<div class="card-top"><div class="badge">Sentence Practice</div><div></div></div>';
+    html += '<div class="card-body">';
+    html += '<div class="prompt-label">Translate to Japanese</div>';
+    html += '<div class="prompt-sentence">' + escapeHtml(picked.entry.en) + '</div>';
+    html += '<form class="type-form" id="typeForm">';
+    html += '<input class="type-input" id="typeInput" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="answer in Japanese">';
+    html += '<div class="type-actions"><button type="submit" class="primary-btn">Check</button></div>';
+    html += '<div class="feedback-line" id="typeFeedback"></div>';
+    html += '</form></div>';
+    els.card.innerHTML = html;
+
+    var input = document.getElementById("typeInput");
+    input.focus();
+    document.getElementById("typeForm").addEventListener("submit", function(e){
+      e.preventDefault();
+      submitSentence(input.value);
+    });
+  }
+
+  function submitSentence(value){
+    var input = document.getElementById("typeInput");
+    var feedback = document.getElementById("typeFeedback");
+    if (input.disabled) return;
+    input.disabled = true;
+    var correct = state.current.correctAnswer;
+    var wasCorrect = normalizeJp(value) === normalizeJp(correct);
+    if (wasCorrect){
+      feedback.textContent = "✓ Correct!";
+      feedback.className = "feedback-line good";
+    } else {
+      feedback.textContent = "✗ Correct answer: " + correct;
+      feedback.className = "feedback-line bad";
+    }
+    registerAnswer(wasCorrect);
+    setTimeout(nextButtonRow, wasCorrect ? 700 : 2800);
+  }
+
+  // ---------- "Choose the right verb form" pattern practice ----------
+  function renderPattern(){
+    var pattern = GRAMMAR_PATTERNS[Math.floor(Math.random()*GRAMMAR_PATTERNS.length)];
+    var eligible = state.words.filter(function(w){ return w.masu && w.te && getFormValue(w, pattern.form); });
+    if (!eligible.length){ renderType(pickWord(null)); return; } // shouldn't happen, safe fallback
+
+    var word = eligible[Math.floor(Math.random()*eligible.length)];
+    var stem = getFormValue(word, "stem");
+    var correctAnswer = getFormValue(word, pattern.form);
+
+    var candidates = [word.dict, word.masu, word.te, stem].filter(function(v){ return v && v !== correctAnswer; });
+    candidates = shuffle(candidates).slice(0,3);
+    while (candidates.length < 3) candidates.push(correctAnswer); // safety net, shouldn't normally trigger
+    var options = shuffle([correctAnswer].concat(candidates));
+
+    state.current = {mode:"pattern", word:word, correctAnswer:correctAnswer};
+
+    var blankLabel = (pattern.prefix || "") + "＿＿＿" + pattern.suffix;
+
+    var html = '<div class="card-top"><div class="badge">Pattern Practice</div><div></div></div>';
+    html += '<div class="card-body">';
+    html += '<div class="prompt-label">Which form completes: ' + escapeHtml(blankLabel) + '</div>';
+    html += '<div class="prompt-word">' + furiganaHtml(word.dict, word.hiragana) + '</div>';
+    html += '<div class="prompt-sub">' + escapeHtml(word.english) + ' &middot; ' + escapeHtml(pattern.name) + ' — ' + escapeHtml(pattern.meaning) + '</div>';
+    html += '<div class="choices">';
+    options.forEach(function(opt){
+      html += '<button class="choice-btn" data-val="' + escapeAttr(opt) + '">' + escapeHtml(opt) + '</button>';
+    });
+    html += '</div></div>';
+    els.card.innerHTML = html;
+
+    Array.prototype.forEach.call(els.card.querySelectorAll(".choice-btn"), function(btn){
+      btn.addEventListener("click", function(){ handleMCAnswer(btn, options); });
+    });
+  }
+
   function nextButtonRow(){ startRound(); }
 
   // ---------- Scoring ----------
@@ -504,11 +634,13 @@
       sounds.correct.play().catch(function(){});
     }
     var word = state.current.word;
-    bump(word, wasCorrect);
+    if (word){
+      bump(word, wasCorrect);
 
-    if (isNewWord(word) && wasCorrect){
-      state.newCorrectCounts[word.dict] = (state.newCorrectCounts[word.dict] || 0) + 1;
-      if (state.newCorrectCounts[word.dict] >= NEW_WORD_MASTERY) graduateWord(word);
+      if (isNewWord(word) && wasCorrect){
+        state.newCorrectCounts[word.dict] = (state.newCorrectCounts[word.dict] || 0) + 1;
+        if (state.newCorrectCounts[word.dict] >= NEW_WORD_MASTERY) graduateWord(word);
+      }
     }
 
     state.answered++;
