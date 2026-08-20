@@ -545,8 +545,8 @@
   // ---------- Sentence pattern practice ----------
   function normalizeJp(s){
     return String(s||"")
-      .replace(/[　\s]+/g, "")   // strip all spaces (full and half width)
-      .replace(/[。.]+$/, "");        // trailing period is optional
+      .replace(/[　\s]+/g, "")            // strip all spaces (full and half width)
+      .replace(/[。、！？，．,.!?]+/g, ""); // strip punctuation anywhere, not just trailing
   }
 
   function pickSentence(){
@@ -606,7 +606,7 @@
       feedback.className = "feedback-line bad";
     }
     registerAnswer(wasCorrect);
-    setTimeout(nextButtonRow, wasCorrect ? 700 : 2800);
+    setTimeout(nextButtonRow, wasCorrect ? 700 : 9000);
   }
 
   // ---------- "Choose the right verb form" pattern practice ----------
