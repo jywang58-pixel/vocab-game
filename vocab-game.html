@@ -254,6 +254,22 @@
   }
 
   // ---------- State ----------
+  var MODES_FOR_STATS = ["mixed","mc","type","pattern","sentence"];
+
+  function loadBestByMode(){
+    var result = {};
+    MODES_FOR_STATS.forEach(function(m){ result[m] = 0; });
+    var saved = null;
+    try { saved = JSON.parse(localStorage.getItem("verbDojoBestByMode")); } catch(e){}
+    if (saved && typeof saved === "object"){
+      MODES_FOR_STATS.forEach(function(m){ if (typeof saved[m] === "number") result[m] = saved[m]; });
+    } else {
+      var legacy = parseInt(localStorage.getItem("verbDojoBest"), 10);
+      if (legacy) result.mixed = legacy; // one-time migration from the old shared best
+    }
+    return result;
+  }
+
   var state = {
     words: [],
     weights: {},           // word.dict -> weight (higher = shown more often)
@@ -261,8 +277,8 @@
     current: null,          // current question object
     xp: 0,
     level: 1,
-    streak: 0,
-    best: parseInt(localStorage.getItem("verbDojoBest"), 10) || 0,
+    streaksByMode: {mixed:0, mc:0, type:0, pattern:0, sentence:0},
+    bestByMode: loadBestByMode(),
     correct: 0,
     answered: 0,
     usingFallback: false,
@@ -523,7 +539,7 @@
       feedback.className = "feedback-line bad";
     }
     registerAnswer(wasCorrect);
-    setTimeout(nextButtonRow, wasCorrect ? 700 : 2800);
+    setTimeout(nextButtonRow, wasCorrect ? 700 : 6800);
   }
 
   // ---------- Sentence pattern practice ----------
@@ -555,7 +571,9 @@
     html += '<div class="prompt-sentence">' + escapeHtml(picked.entry.en) + '</div>';
     html += '<form class="type-form" id="typeForm">';
     html += '<input class="type-input" id="typeInput" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="answer in Japanese">';
-    html += '<div class="type-actions"><button type="submit" class="primary-btn">Check</button></div>';
+    html += '<div class="type-actions"><button type="submit" class="primary-btn">Check</button>';
+    if (MIC_SUPPORTED) html += '<button type="button" class="ghost-btn" id="micBtn">🎤 Speak</button>';
+    html += '</div>';
     html += '<div class="feedback-line" id="typeFeedback"></div>';
     html += '</form></div>';
     els.card.innerHTML = html;
@@ -566,6 +584,11 @@
       e.preventDefault();
       submitSentence(input.value);
     });
+
+    if (MIC_SUPPORTED){
+      var micBtn = document.getElementById("micBtn");
+      micBtn.addEventListener("click", function(){ startMicInput(input, micBtn); });
+    }
   }
 
   function submitSentence(value){
@@ -644,15 +667,16 @@
     }
 
     state.answered++;
+    var m = state.mode;
     if (wasCorrect){
       state.correct++;
-      state.streak++;
-      state.best = Math.max(state.best, state.streak);
-      localStorage.setItem("verbDojoBest", state.best);
-      var bonus = Math.floor(state.streak/5) * 5;
+      state.streaksByMode[m] = (state.streaksByMode[m] || 0) + 1;
+      state.bestByMode[m] = Math.max(state.bestByMode[m] || 0, state.streaksByMode[m]);
+      localStorage.setItem("verbDojoBestByMode", JSON.stringify(state.bestByMode));
+      var bonus = Math.floor(state.streaksByMode[m]/5) * 5;
       state.xp += 10 + bonus;
     } else {
-      state.streak = 0;
+      state.streaksByMode[m] = 0;
     }
     var newLevel = Math.floor(state.xp/50) + 1;
     state.level = newLevel;
@@ -661,12 +685,48 @@
 
   function renderStats(){
     els.statLevel.textContent = state.level;
-    els.statStreak.textContent = state.streak + " 🔥";
-    els.statBest.textContent = state.best;
+    els.statStreak.textContent = (state.streaksByMode[state.mode] || 0) + " 🔥";
+    els.statBest.textContent = state.bestByMode[state.mode] || 0;
     els.statAcc.textContent = state.answered ? Math.round(100*state.correct/state.answered) + "%" : "—";
     var xpIntoLevel = state.xp % 50;
     els.xpBar.style.width = (xpIntoLevel/50*100) + "%";
     els.xpLabel.textContent = xpIntoLevel + " / 50 XP";
+  }
+
+  // ---------- Mic input (Sentence mode) — desktop Chrome on Mac only ----------
+  // Speech-to-text via the Web Speech API is unreliable/unsupported on Safari and
+  // WebKit-based browsers (which includes every browser on iOS), so this is scoped
+  // narrowly to avoid a broken/inconsistent mic button anywhere else.
+  function isMacChrome(){
+    var ua = navigator.userAgent;
+    return /Macintosh/.test(ua) && /Chrome\//.test(ua) && !/Edg\//.test(ua) && !/OPR\//.test(ua);
+  }
+  var SpeechRecognitionCtor = window.SpeechRecognition || window.webkitSpeechRecognition;
+  var MIC_SUPPORTED = isMacChrome() && !!SpeechRecognitionCtor;
+
+  function startMicInput(input, micBtn){
+    var recognition = new SpeechRecognitionCtor();
+    recognition.lang = "ja-JP";
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+    micBtn.disabled = true;
+    micBtn.textContent = "🎤 Listening…";
+
+    recognition.onresult = function(e){
+      input.value = e.results[0][0].transcript;
+      input.focus();
+    };
+    recognition.onerror = function(e){
+      console.warn("Speech recognition error:", e.error);
+      micBtn.textContent = "🎤 Speak (" + e.error + ")";
+      micBtn.disabled = false;
+    };
+    recognition.onend = function(){
+      micBtn.textContent = "🎤 Speak";
+      micBtn.disabled = false;
+    };
+    recognition.start();
   }
 
   // ---------- Helpers ----------
@@ -703,6 +763,7 @@
     Array.prototype.forEach.call(els.modeSelector.querySelectorAll(".mode-btn"), function(b){ b.classList.remove("active"); });
     btn.classList.add("active");
     state.mode = btn.getAttribute("data-mode");
+    renderStats();
     startRound();
   });
 
