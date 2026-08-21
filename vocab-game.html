@@ -563,7 +563,7 @@
     var picked = pickSentence();
     if (!picked){ renderType(pickWord(null)); return; } // no sentence bank available, fall back
 
-    state.current = {mode:"sentence", word:null, correctAnswer: picked.entry.jp};
+    state.current = {mode:"sentence", word:null, correctAnswer: picked.entry.jp, correctAnswerKana: picked.entry.kana};
 
     var html = '<div class="card-top"><div class="badge">Sentence Practice</div><div></div></div>';
     html += '<div class="card-body">';
@@ -597,7 +597,9 @@
     if (input.disabled) return;
     input.disabled = true;
     var correct = state.current.correctAnswer;
-    var wasCorrect = normalizeJp(value) === normalizeJp(correct);
+    var correctKana = state.current.correctAnswerKana;
+    var typed = normalizeJp(value);
+    var wasCorrect = typed === normalizeJp(correct) || (correctKana && typed === normalizeJp(correctKana));
     if (wasCorrect){
       feedback.textContent = "✓ Correct!";
       feedback.className = "feedback-line good";
