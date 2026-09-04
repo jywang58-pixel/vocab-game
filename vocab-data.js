@@ -89,5 +89,19 @@ window.VOCAB_WORDS = [
   {dict:"なおす", english:"to fix / to repair", masu:"なおします", te:"なおして", group:1, hiragana:"なおす"},
   {dict:"もうしこみする", english:"to apply (for something)", masu:"もうしこみします", te:"もうしこみして", group:3, hiragana:"もうしこみする"},
   {dict:"きめる", english:"to decide", masu:"きめます", te:"きめて", group:2, hiragana:"きめる"},
-  {dict:"やる", english:"to do (casual)", masu:"やります", te:"やって", group:1, hiragana:"やる"}
+  {dict:"やる", english:"to do (casual)", masu:"やります", te:"やって", group:1, hiragana:"やる"},
+  {dict:"忘れる", english:"to forget", masu:"忘れます", te:"忘れて", group:2, hiragana:"わすれる"},
+  {dict:"運転する", english:"to drive", masu:"運転します", te:"運転して", group:3, hiragana:"うんてんする"},
+  {dict:"習う", english:"to learn / to study (under someone)", masu:"習います", te:"習って", group:1, hiragana:"ならう"},
+  {dict:"道に迷う", english:"to get lost", masu:"道に迷います", te:"道に迷って", group:1, hiragana:"みちにまよう"},
+  {dict:"休む", english:"to rest / to take a day off", masu:"休みます", te:"休んで", group:1, hiragana:"やすむ"},
+  {dict:"泊まる", english:"to stay overnight / to lodge", masu:"泊まります", te:"泊まって", group:1, hiragana:"とまる"},
+  {dict:"サボる", english:"to skip / to cut (class, work)", masu:"サボります", te:"サボって", group:1, hiragana:"サボる"},
+  {dict:"やめる", english:"to quit / to give up (a habit, activity)", masu:"やめます", te:"やめて", group:2, hiragana:"やめる"},
+  {dict:"調べる", english:"to look up / to investigate", masu:"調べます", te:"調べて", group:2, hiragana:"しらべる"},
+  {dict:"散歩する", english:"to take a walk / to stroll", masu:"散歩します", te:"散歩して", group:3, hiragana:"さんぽする"},
+  {dict:"ぶらぶらする", english:"to wander around / to stroll aimlessly", masu:"ぶらぶらします", te:"ぶらぶらして", group:3, hiragana:"ぶらぶらする"},
+  {dict:"準備する", english:"to prepare", masu:"準備します", te:"準備して", group:3, hiragana:"じゅんびする"},
+  {dict:"相談する", english:"to consult / to discuss (a problem)", masu:"相談します", te:"相談して", group:3, hiragana:"そうだんする"},
+  {dict:"謝る", english:"to apologize", masu:"謝ります", te:"謝って", group:1, hiragana:"あやまる"}
 ];

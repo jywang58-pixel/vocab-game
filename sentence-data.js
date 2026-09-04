@@ -210,5 +210,39 @@ window.SENTENCE_PRACTICE = [
   {pattern:"て (connector)", en:"I'll wash my hands, then eat.", jp:"手を洗って、食べます。", kana:"てをあらって、たべます。"},
   {pattern:"て (connector)", en:"I'll clean, then do laundry.", jp:"掃除して、洗濯します。", kana:"そうじして、せんたくします。"},
   {pattern:"て (connector)", en:"I'll call my friend, then go out.", jp:"友達に電話して、出かけます。", kana:"ともだちにでんわして、でかけます。"},
-  {pattern:"て (connector)", en:"I'll go out, then come home late.", jp:"出かけて、遅く帰ります。", kana:"でかけて、おそくかえります。"}
+  {pattern:"て (connector)", en:"I'll go out, then come home late.", jp:"出かけて、遅く帰ります。", kana:"でかけて、おそくかえります。"},
+
+  // た form + ことがあります — "I have done ~ before"
+  {pattern:"ことがあります", en:"I have been to Japan before.", jp:"日本に行ったことがあります。", kana:"にほんにいったことがあります。"},
+  {pattern:"ことがあります", en:"I have eaten sushi before.", jp:"すしを食べたことがあります。", kana:"すしをたべたことがあります。"},
+  {pattern:"ことがあります", en:"I have climbed Mt. Fuji before.", jp:"富士山にのぼったことがあります。", kana:"ふじさんにのぼったことがあります。"},
+  {pattern:"ことがあります", en:"I have gotten lost before.", jp:"道に迷ったことがあります。", kana:"みちにまよったことがあります。"},
+  {pattern:"ことがあります", en:"I have skipped work before.", jp:"会社をサボったことがあります。", kana:"かいしゃをサボったことがあります。"},
+  {pattern:"ことがあります", en:"I have consulted with a teacher before.", jp:"先生に相談したことがあります。", kana:"せんせいにそうだんしたことがあります。"},
+  {pattern:"ことがあります", en:"I have broken up with a girlfriend before.", jp:"彼女と別れたことがあります。", kana:"かのじょとわかれたことがあります。"},
+  {pattern:"ことがあります", en:"I have stayed at a hotel before.", jp:"ホテルに泊まったことがあります。", kana:"ホテルにとまったことがあります。"},
+  {pattern:"ことがあります", en:"I have learned piano before.", jp:"ピアノを習ったことがあります。", kana:"ピアノをならったことがあります。"},
+  {pattern:"ことがあります", en:"I have forgotten kanji before.", jp:"漢字を忘れたことがあります。", kana:"かんじをわすれたことがあります。"},
+
+  // た form + ほうがいいです — "it's better to have done ~ / you should ~"
+  {pattern:"ほうがいいです", en:"You should go home early.", jp:"早く帰ったほうがいいです。", kana:"はやくかえったほうがいいです。"},
+  {pattern:"ほうがいいです", en:"You should take medicine.", jp:"薬を飲んだほうがいいです。", kana:"くすりをのんだほうがいいです。"},
+  {pattern:"ほうがいいです", en:"You should apologize.", jp:"謝ったほうがいいです。", kana:"あやまったほうがいいです。"},
+  {pattern:"ほうがいいです", en:"You should consult the teacher.", jp:"先生に相談したほうがいいです。", kana:"せんせいにそうだんしたほうがいいです。"},
+  {pattern:"ほうがいいです", en:"You should rest more.", jp:"もっと休んだほうがいいです。", kana:"もっとやすんだほうがいいです。"},
+  {pattern:"ほうがいいです", en:"You should prepare.", jp:"準備したほうがいいです。", kana:"じゅんびしたほうがいいです。"},
+  {pattern:"ほうがいいです", en:"You should look up the word.", jp:"単語を調べたほうがいいです。", kana:"たんごをしらべたほうがいいです。"},
+  {pattern:"ほうがいいです", en:"You should quit smoking.", jp:"タバコをやめたほうがいいです。", kana:"タバコをやめたほうがいいです。"},
+  {pattern:"ほうがいいです", en:"You should turn off the lights.", jp:"電気を消したほうがいいです。", kana:"でんきをけしたほうがいいです。"},
+  {pattern:"ほうがいいです", en:"You should tidy your room.", jp:"部屋を片付けたほうがいいです。", kana:"へやをかたづけたほうがいいです。"},
+
+  // ~たり、~たりします — "doing things like X and Y (among others)"
+  {pattern:"たり〜たりします", en:"On weekends, I do things like cleaning and laundry.", jp:"週末は掃除したり、洗濯したりします。", kana:"しゅうまつはそうじしたり、せんたくしたりします。"},
+  {pattern:"たり〜たりします", en:"On days off, I do things like swimming and walking in the park.", jp:"休みの日は泳いだり、公園を歩いたりします。", kana:"やすみのひはおよいだり、こうえんをあるいたりします。"},
+  {pattern:"たり〜たりします", en:"On trips, I do things like taking photos and eating food.", jp:"旅行では写真を撮ったり、料理を食べたりします。", kana:"りょこうではしゃしんをとったり、りょうりをたべたりします。"},
+  {pattern:"たり〜たりします", en:"In the classroom, I do things like speaking Japanese and memorizing words.", jp:"教室では日本語を話したり、単語を覚えたりします。", kana:"きょうしつではにほんごをはなしたり、たんごをおぼえたりします。"},
+  {pattern:"たり〜たりします", en:"On weekends, I do things like playing with friends and watching movies.", jp:"週末は友達と遊んだり、映画を見たりします。", kana:"しゅうまつはともだちとあそんだり、えいがをみたりします。"},
+  {pattern:"たり〜たりします", en:"Sometimes I do things like wandering around and taking photos.", jp:"時々ぶらぶらしたり、写真を撮ったりします。", kana:"ときどきぶらぶらしたり、しゃしんをとったりします。"},
+  {pattern:"たり〜たりします", en:"Before the meeting, I do things like researching materials and preparing.", jp:"会議の前に、資料を調べたり、準備したりします。", kana:"かいぎのまえに、しりょうをしらべたり、じゅんびしたりします。"},
+  {pattern:"たり〜たりします", en:"When traveling, I do things like staying at hotels and riding trains.", jp:"旅行の時、ホテルに泊まったり、電車に乗ったりします。", kana:"りょこうのとき、ホテルにとまったり、でんしゃにのったりします。"}
 ];

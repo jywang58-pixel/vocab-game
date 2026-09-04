@@ -402,7 +402,9 @@
     {name:"てもいいですか", form:"te", suffix:"もいいですか", meaning:"may I ~?"},
     {name:"ています",     form:"te",   suffix:"います",       meaning:"ongoing / habitual action"},
     {name:"ていました",   form:"te",   suffix:"いました",     meaning:"past progressive"},
-    {name:"まだ〜ていません", form:"te", suffix:"いません", prefix:"まだ", meaning:"haven't done ~ yet"}
+    {name:"まだ〜ていません", form:"te", suffix:"いません", prefix:"まだ", meaning:"haven't done ~ yet"},
+    {name:"ことがあります", form:"ta", suffix:"ことがあります", meaning:"I have done ~ before"},
+    {name:"ほうがいいです", form:"ta", suffix:"ほうがいいです", meaning:"it's better to have done ~ / you should ~"}
   ];
 
   function getFormValue(word, formType){
@@ -410,6 +412,12 @@
     if (formType === "masu") return word.masu || null;
     if (formType === "te") return word.te || null;
     if (formType === "stem") return word.masu ? word.masu.slice(0, -2) : null; // drop trailing ます
+    if (formType === "ta"){ // た form is a regular て/で -> た/だ swap on the te form
+      if (!word.te) return null;
+      if (word.te.slice(-1) === "で") return word.te.slice(0, -1) + "だ";
+      if (word.te.slice(-1) === "て") return word.te.slice(0, -1) + "た";
+      return null;
+    }
     return null;
   }
 
