@@ -505,8 +505,9 @@
       askTe = !askTe; target = askTe ? word.te : word.masu; label = askTe ? "Te form" : "Masu form";
     }
     if (!target){ renderMC(word); return; } // neither field present, bail to MC
+    var targetKana = askTe ? word.teHiragana : word.masuHiragana;
 
-    state.current = {mode:"type", word:word, correctAnswer:target};
+    state.current = {mode:"type", word:word, correctAnswer:target, correctAnswerKana:targetKana};
 
     var html = '<div class="card-top">';
     html += isNewWord(word) ? '<div class="badge-new">✨ New</div>' : '<div></div>';
@@ -536,9 +537,10 @@
     var feedback = document.getElementById("typeFeedback");
     if (input.disabled) return;
     input.disabled = true;
-    var clean = (value||"").trim();
     var correct = state.current.correctAnswer;
-    var wasCorrect = clean === correct;
+    var correctKana = state.current.correctAnswerKana;
+    var typed = normalizeJp(value);
+    var wasCorrect = typed === normalizeJp(correct) || (correctKana && typed === normalizeJp(correctKana));
     if (wasCorrect){
       feedback.textContent = "✓ Correct!";
       feedback.className = "feedback-line good";
