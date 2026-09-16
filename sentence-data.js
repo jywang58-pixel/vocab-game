@@ -244,5 +244,17 @@ window.SENTENCE_PRACTICE = [
   {pattern:"たり〜たりします", en:"On weekends, I do things like playing with friends and watching movies.", jp:"週末は友達と遊んだり、映画を見たりします。", kana:"しゅうまつはともだちとあそんだり、えいがをみたりします。"},
   {pattern:"たり〜たりします", en:"Sometimes I do things like wandering around and taking photos.", jp:"時々ぶらぶらしたり、写真を撮ったりします。", kana:"ときどきぶらぶらしたり、しゃしんをとったりします。"},
   {pattern:"たり〜たりします", en:"Before the meeting, I do things like researching materials and preparing.", jp:"会議の前に、資料を調べたり、準備したりします。", kana:"かいぎのまえに、しりょうをしらべたり、じゅんびしたりします。"},
-  {pattern:"たり〜たりします", en:"When traveling, I do things like staying at hotels and riding trains.", jp:"旅行の時、ホテルに泊まったり、電車に乗ったりします。", kana:"りょこうのとき、ホテルにとまったり、でんしゃにのったりします。"}
+  {pattern:"たり〜たりします", en:"When traveling, I do things like staying at hotels and riding trains.", jp:"旅行の時、ホテルに泊まったり、電車に乗ったりします。", kana:"りょこうのとき、ホテルにとまったり、でんしゃにのったりします。"},
+
+  // nai form + でください — "please don't do ~"
+  {pattern:"ないでください", en:"Please don't take photos here.", jp:"ここで写真を撮らないでください。", kana:"ここでしゃしんをとらないでください。"},
+  {pattern:"ないでください", en:"Please don't make phone calls during the meeting.", jp:"会議中に電話しないでください。", kana:"かいぎちゅうにでんわしないでください。"},
+  {pattern:"ないでください", en:"Please don't smoke during class.", jp:"授業中にタバコをすわないでください。", kana:"じゅぎょうちゅうにタバコをすわないでください。"},
+  {pattern:"ないでください", en:"Please don't worry.", jp:"心配しないでください。", kana:"しんぱいしないでください。"},
+  {pattern:"ないでください", en:"Please don't push yourself too hard.", jp:"無理しないでください。", kana:"むりしないでください。"},
+  {pattern:"ないでください", en:"Please don't forget the appointment.", jp:"約束を忘れないでください。", kana:"やくそくをわすれないでください。"},
+  {pattern:"ないでください", en:"Please don't sit here.", jp:"ここに座らないでください。", kana:"ここにすわらないでください。"},
+  {pattern:"ないでください", en:"Please don't skip class.", jp:"授業をサボらないでください。", kana:"じゅぎょうをサボらないでください。"},
+  {pattern:"ないでください", en:"Please don't throw away trash here.", jp:"ごみを捨てないでください。", kana:"ごみをすてないでください。"},
+  {pattern:"ないでください", en:"Please don't be late.", jp:"遅れないでください。", kana:"おくれないでください。"}
 ];

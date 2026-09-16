@@ -87,7 +87,15 @@
     display:flex; flex-direction:column; align-items:stretch; justify-content:flex-start;
     text-align:center; position:relative; overflow:hidden;
   }
+  .mute-btn{
+    width:26px; height:26px; border-radius:50%; padding:0; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    background:var(--bg-2); border:1px solid var(--line); color:var(--ink-soft);
+    font-size:13px; cursor:pointer; -webkit-tap-highlight-color: transparent;
+  }
+  .mute-btn:hover{ border-color:var(--accent-soft); }
   .card-top{ display:flex; justify-content:space-between; align-items:center; gap:8px; width:100%; margin-bottom:16px; }
+  .card-top-left{ display:flex; align-items:center; gap:8px; }
   .card-body{ flex:1; width:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; }
   .card .badge{
     font-size:13px; color:var(--ink-soft);
@@ -283,6 +291,7 @@
     answered: 0,
     usingFallback: false,
     showFurigana: true,
+    muted: localStorage.getItem("verbDojoMuted") === "1",
     dictToHiragana: {},
     knownWords: {},         // dict -> true, words that have graduated past "new" status
     newCorrectCounts: {},   // dict -> correct answers so far while still marked new
@@ -385,7 +394,7 @@
   }
 
   // ---------- Question construction ----------
-  var PROMPT_TYPES_MC = ["dict2eng","eng2dict","dict2masu","dict2te"];
+  var PROMPT_TYPES_MC = ["dict2eng","eng2dict","dict2masu","dict2te","dict2nai"];
 
   // Grammar patterns for "choose the right form" practice — same 14 patterns as
   // sentence-data.js, minus the て-connector (no fixed suffix, doesn't fit this format).
@@ -404,13 +413,15 @@
     {name:"ていました",   form:"te",   suffix:"いました",     meaning:"past progressive"},
     {name:"まだ〜ていません", form:"te", suffix:"いません", prefix:"まだ", meaning:"haven't done ~ yet"},
     {name:"ことがあります", form:"ta", suffix:"ことがあります", meaning:"I have done ~ before"},
-    {name:"ほうがいいです", form:"ta", suffix:"ほうがいいです", meaning:"it's better to have done ~ / you should ~"}
+    {name:"ほうがいいです", form:"ta", suffix:"ほうがいいです", meaning:"it's better to have done ~ / you should ~"},
+    {name:"ないでください", form:"nai", suffix:"でください", meaning:"please don't do ~"}
   ];
 
   function getFormValue(word, formType){
     if (formType === "dict") return word.dict;
     if (formType === "masu") return word.masu || null;
     if (formType === "te") return word.te || null;
+    if (formType === "nai") return word.nai || null;
     if (formType === "stem") return word.masu ? word.masu.slice(0, -2) : null; // drop trailing ます
     if (formType === "ta"){ // た form is a regular て/で -> た/だ swap on the te form
       if (!word.te) return null;
@@ -447,9 +458,12 @@
     } else if (type === "dict2masu"){
       promptLabel = "Masu form of " + word.dict + " (" + word.english + ")?"; promptText = word.dict;
       correctAnswer = word.masu; pool = state.words.map(function(w){return w.masu;}).filter(Boolean);
-    } else {
+    } else if (type === "dict2te"){
       promptLabel = "Te form of " + word.dict + " (" + word.english + ")?"; promptText = word.dict;
       correctAnswer = word.te; pool = state.words.map(function(w){return w.te;}).filter(Boolean);
+    } else {
+      promptLabel = "Nai form of " + word.dict + " (" + word.english + ")?"; promptText = word.dict;
+      correctAnswer = word.nai; pool = state.words.map(function(w){return w.nai;}).filter(Boolean);
     }
     if (!correctAnswer || pool.length < 4){ renderType(word); return; }
 
@@ -461,9 +475,10 @@
 
     var promptIsDict = (type !== "eng2dict");
 
-    var html = '<div class="card-top">';
+    var html = '<div class="card-top"><div class="card-top-left">';
     html += isNewWord(word) ? '<div class="badge-new">✨ New</div>' : '<div></div>';
-    html += '<div class="badge-cluster">';
+    html += muteBtnHtml();
+    html += '</div><div class="badge-cluster">';
     html += word.group ? ('<div class="badge-group">' + escapeHtml(groupLabel(word.group)) + '</div>') : '';
     html += '</div></div><div class="card-body">';
     html += '<div class="prompt-label">' + escapeHtml(promptLabel) + '</div>';
@@ -475,6 +490,7 @@
     });
     html += '</div></div>';
     els.card.innerHTML = html;
+    wireMuteBtn();
 
     Array.prototype.forEach.call(els.card.querySelectorAll(".choice-btn"), function(btn){
       btn.addEventListener("click", function(){ handleMCAnswer(btn, options); });
@@ -498,20 +514,21 @@
   }
 
   function renderType(word){
-    var askTe = Math.random() < 0.5;
-    var target = askTe ? word.te : word.masu;
-    var label = askTe ? "Te form" : "Masu form";
-    if (!target){ // this word has no data for that field, fall back to the other
-      askTe = !askTe; target = askTe ? word.te : word.masu; label = askTe ? "Te form" : "Masu form";
-    }
-    if (!target){ renderMC(word); return; } // neither field present, bail to MC
-    var targetKana = askTe ? word.teHiragana : word.masuHiragana;
+    var candidates = shuffle([
+      {label:"Masu form", target:word.masu, kana:word.masuHiragana},
+      {label:"Te form", target:word.te, kana:word.teHiragana},
+      {label:"Nai form", target:word.nai, kana:word.naiHiragana}
+    ].filter(function(c){ return c.target; }));
+    if (!candidates.length){ renderMC(word); return; } // no forms present at all, bail to MC
+    var choice = candidates[0];
+    var target = choice.target, label = choice.label, targetKana = choice.kana;
 
     state.current = {mode:"type", word:word, correctAnswer:target, correctAnswerKana:targetKana};
 
-    var html = '<div class="card-top">';
+    var html = '<div class="card-top"><div class="card-top-left">';
     html += isNewWord(word) ? '<div class="badge-new">✨ New</div>' : '<div></div>';
-    html += '<div class="badge-cluster">';
+    html += muteBtnHtml();
+    html += '</div><div class="badge-cluster">';
     html += word.group ? ('<div class="badge-group">' + escapeHtml(groupLabel(word.group)) + '</div>') : '';
     html += '</div></div><div class="card-body">';
     html += '<div class="prompt-label">Type the ' + label + '</div>';
@@ -523,6 +540,7 @@
     html += '<div class="feedback-line" id="typeFeedback"></div>';
     html += '</form></div>';
     els.card.innerHTML = html;
+    wireMuteBtn();
 
     var input = document.getElementById("typeInput");
     input.focus();
@@ -575,7 +593,7 @@
 
     state.current = {mode:"sentence", word:null, correctAnswer: picked.entry.jp, correctAnswerKana: picked.entry.kana};
 
-    var html = '<div class="card-top"><div class="badge">Sentence Practice</div><div></div></div>';
+    var html = '<div class="card-top"><div class="card-top-left"><div class="badge">Sentence Practice</div>' + muteBtnHtml() + '</div><div></div></div>';
     html += '<div class="card-body">';
     html += '<div class="prompt-label">Translate to Japanese</div>';
     html += '<div class="prompt-sentence">' + escapeHtml(picked.entry.en) + '</div>';
@@ -587,6 +605,7 @@
     html += '<div class="feedback-line" id="typeFeedback"></div>';
     html += '</form></div>';
     els.card.innerHTML = html;
+    wireMuteBtn();
 
     var input = document.getElementById("typeInput");
     input.focus();
@@ -631,7 +650,7 @@
     var stem = getFormValue(word, "stem");
     var correctAnswer = getFormValue(word, pattern.form);
 
-    var candidates = [word.dict, word.masu, word.te, stem].filter(function(v){ return v && v !== correctAnswer; });
+    var candidates = [word.dict, word.masu, word.te, stem, word.nai].filter(function(v){ return v && v !== correctAnswer; });
     candidates = shuffle(candidates).slice(0,3);
     while (candidates.length < 3) candidates.push(correctAnswer); // safety net, shouldn't normally trigger
     var options = shuffle([correctAnswer].concat(candidates));
@@ -640,7 +659,7 @@
 
     var blankLabel = (pattern.prefix || "") + "＿＿＿" + pattern.suffix;
 
-    var html = '<div class="card-top"><div class="badge">Pattern Practice</div><div></div></div>';
+    var html = '<div class="card-top"><div class="card-top-left"><div class="badge">Pattern Practice</div>' + muteBtnHtml() + '</div><div></div></div>';
     html += '<div class="card-body">';
     html += '<div class="prompt-label">Which form completes: ' + escapeHtml(blankLabel) + '</div>';
     html += '<div class="prompt-word">' + furiganaHtml(word.dict, word.hiragana) + '</div>';
@@ -651,6 +670,7 @@
     });
     html += '</div></div>';
     els.card.innerHTML = html;
+    wireMuteBtn();
 
     Array.prototype.forEach.call(els.card.querySelectorAll(".choice-btn"), function(btn){
       btn.addEventListener("click", function(){ handleMCAnswer(btn, options); });
@@ -661,12 +681,14 @@
 
   // ---------- Scoring ----------
   function registerAnswer(wasCorrect){
-    if (!wasCorrect){
-      sounds.wrong.currentTime = 0;
-      sounds.wrong.play().catch(function(){});
-    } else {
-      sounds.correct.currentTime = 0;
-      sounds.correct.play().catch(function(){});
+    if (!state.muted){
+      if (!wasCorrect){
+        sounds.wrong.currentTime = 0;
+        sounds.wrong.play().catch(function(){});
+      } else {
+        sounds.correct.currentTime = 0;
+        sounds.correct.play().catch(function(){});
+      }
     }
     var word = state.current.word;
     if (word){
@@ -756,6 +778,33 @@
     });
   }
   function escapeAttr(s){ return escapeHtml(s).replace(/"/g,"&quot;"); }
+  var SPEAKER_ICON_SVG =
+    '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+    '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>' +
+    '<path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>' +
+    '<path d="M19.07 4.93a10 10 0 0 1 0 14.14"></path>' +
+    '</svg>';
+  var SPEAKER_MUTED_ICON_SVG =
+    '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
+    '<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>' +
+    '<line x1="2" y1="21" x2="21" y2="2"></line>' +
+    '</svg>';
+
+  function muteBtnHtml(){
+    var icon = state.muted ? SPEAKER_MUTED_ICON_SVG : SPEAKER_ICON_SVG;
+    var label = state.muted ? "Unmute sound effects" : "Mute sound effects";
+    return '<button type="button" class="mute-btn" id="muteBtn" aria-label="' + label + '">' + icon + '</button>';
+  }
+  function wireMuteBtn(){
+    var btn = document.getElementById("muteBtn");
+    if (!btn) return;
+    btn.addEventListener("click", function(){
+      state.muted = !state.muted;
+      localStorage.setItem("verbDojoMuted", state.muted ? "1" : "0");
+      btn.innerHTML = state.muted ? SPEAKER_MUTED_ICON_SVG : SPEAKER_ICON_SVG;
+      btn.setAttribute("aria-label", state.muted ? "Unmute sound effects" : "Mute sound effects");
+    });
+  }
   function furiganaHtml(text, reading){
     var safeText = escapeHtml(text);
     if (!reading || reading === text) return safeText;
@@ -784,6 +833,9 @@
     els.app.classList.toggle("hide-furigana", !state.showFurigana);
     els.furiganaToggle.textContent = "ふりがな: " + (state.showFurigana ? "On" : "Off");
   });
+
+  // Mute button markup is rebuilt into every question card (see muteBtnHtml/wireMuteBtn
+  // below), since it sits inline next to the top-left badge rather than as a fixed element.
 
   els.refreshBtn.addEventListener("click", function(){
     els.card.innerHTML = '<div class="state-box"><div class="spinner"></div><div>Refreshing from your sheet…</div></div>';
