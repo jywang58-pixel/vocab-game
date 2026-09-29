@@ -256,5 +256,29 @@ window.SENTENCE_PRACTICE = [
   {pattern:"ないでください", en:"Please don't sit here.", jp:"ここに座らないでください。", kana:"ここにすわらないでください。"},
   {pattern:"ないでください", en:"Please don't skip class.", jp:"授業をサボらないでください。", kana:"じゅぎょうをサボらないでください。"},
   {pattern:"ないでください", en:"Please don't throw away trash here.", jp:"ごみを捨てないでください。", kana:"ごみをすてないでください。"},
-  {pattern:"ないでください", en:"Please don't be late.", jp:"遅れないでください。", kana:"おくれないでください。"}
+  {pattern:"ないでください", en:"Please don't be late.", jp:"遅れないでください。", kana:"おくれないでください。"},
+
+  // ~なきゃいけません — "must do ~ / have to do ~"
+  {pattern:"なきゃいけません", en:"I have to go home early.", jp:"早く帰らなきゃいけません。", kana:"はやくかえらなきゃいけません。"},
+  {pattern:"なきゃいけません", en:"I have to take medicine.", jp:"薬を飲まなきゃいけません。", kana:"くすりをのまなきゃいけません。"},
+  {pattern:"なきゃいけません", en:"I have to do my homework.", jp:"宿題をやらなきゃいけません。", kana:"しゅくだいをやらなきゃいけません。"},
+  {pattern:"なきゃいけません", en:"I have to go to work.", jp:"仕事に行かなきゃいけません。", kana:"しごとにいかなきゃいけません。"},
+  {pattern:"なきゃいけません", en:"I have to clean my room.", jp:"部屋を掃除しなきゃいけません。", kana:"へやをそうじしなきゃいけません。"},
+  {pattern:"なきゃいけません", en:"I have to consult the teacher.", jp:"先生に相談しなきゃいけません。", kana:"せんせいにそうだんしなきゃいけません。"},
+  {pattern:"なきゃいけません", en:"I have to fix the car.", jp:"車をなおさなきゃいけません。", kana:"くるまをなおさなきゃいけません。"},
+  {pattern:"なきゃいけません", en:"I have to pay money.", jp:"お金を払わなきゃいけません。", kana:"おかねをはらわなきゃいけません。"},
+  {pattern:"なきゃいけません", en:"I have to memorize the words.", jp:"単語を覚えなきゃいけません。", kana:"たんごをおぼえなきゃいけません。"},
+  {pattern:"なきゃいけません", en:"I have to apologize.", jp:"謝らなきゃいけません。", kana:"あやまらなきゃいけません。"},
+
+  // ~ないほうがいいです — "it's better not to do ~ / you shouldn't ~"
+  {pattern:"ないほうがいいです", en:"You shouldn't smoke.", jp:"タバコをすわないほうがいいです。", kana:"タバコをすわないほうがいいです。"},
+  {pattern:"ないほうがいいです", en:"You shouldn't push yourself too hard.", jp:"無理しないほうがいいです。", kana:"むりしないほうがいいです。"},
+  {pattern:"ないほうがいいです", en:"You shouldn't drink alcohol.", jp:"お酒を飲まないほうがいいです。", kana:"おさけをのまないほうがいいです。"},
+  {pattern:"ないほうがいいです", en:"You shouldn't worry.", jp:"心配しないほうがいいです。", kana:"しんぱいしないほうがいいです。"},
+  {pattern:"ないほうがいいです", en:"You shouldn't be late.", jp:"遅れないほうがいいです。", kana:"おくれないほうがいいです。"},
+  {pattern:"ないほうがいいです", en:"You shouldn't skip class.", jp:"授業をサボらないほうがいいです。", kana:"じゅぎょうをサボらないほうがいいです。"},
+  {pattern:"ないほうがいいです", en:"You shouldn't forget the appointment.", jp:"約束を忘れないほうがいいです。", kana:"やくそくをわすれないほうがいいです。"},
+  {pattern:"ないほうがいいです", en:"You shouldn't rush.", jp:"急がないほうがいいです。", kana:"いそがないほうがいいです。"},
+  {pattern:"ないほうがいいです", en:"It's better not to turn on the lights.", jp:"電気をつけないほうがいいです。", kana:"でんきをつけないほうがいいです。"},
+  {pattern:"ないほうがいいです", en:"You shouldn't forget.", jp:"忘れないほうがいいです。", kana:"わすれないほうがいいです。"}
 ];

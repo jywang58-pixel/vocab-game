@@ -414,7 +414,9 @@
     {name:"まだ〜ていません", form:"te", suffix:"いません", prefix:"まだ", meaning:"haven't done ~ yet"},
     {name:"ことがあります", form:"ta", suffix:"ことがあります", meaning:"I have done ~ before"},
     {name:"ほうがいいです", form:"ta", suffix:"ほうがいいです", meaning:"it's better to have done ~ / you should ~"},
-    {name:"ないでください", form:"nai", suffix:"でください", meaning:"please don't do ~"}
+    {name:"ないでください", form:"nai", suffix:"でください", meaning:"please don't do ~"},
+    {name:"なきゃいけません", form:"naistem", suffix:"いけません", meaning:"must do ~ / have to do ~"},
+    {name:"ないほうがいいです", form:"nai", suffix:"ほうがいいです", meaning:"it's better not to do ~ / you shouldn't ~"}
   ];
 
   function getFormValue(word, formType){
@@ -422,6 +424,7 @@
     if (formType === "masu") return word.masu || null;
     if (formType === "te") return word.te || null;
     if (formType === "nai") return word.nai || null;
+    if (formType === "naistem") return word.nai ? word.nai.slice(0, -1) + "きゃ" : null; // ~ない -> ~なきゃ
     if (formType === "stem") return word.masu ? word.masu.slice(0, -2) : null; // drop trailing ます
     if (formType === "ta"){ // た form is a regular て/で -> た/だ swap on the te form
       if (!word.te) return null;
