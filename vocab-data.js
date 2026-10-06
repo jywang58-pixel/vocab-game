@@ -112,5 +112,14 @@ window.VOCAB_WORDS = [
   {dict:"無理する", english:"to overdo it / to push oneself too hard", masu:"無理します", te:"無理して", group:3, hiragana:"むりする", masuHiragana:"むりします", teHiragana:"むりして", nai:"無理しない", naiHiragana:"むりしない"},
   {dict:"気にする", english:"to worry about / to mind (something)", masu:"気にします", te:"気にして", group:3, hiragana:"きにする", masuHiragana:"きにします", teHiragana:"きにして", nai:"気にしない", naiHiragana:"きにしない"},
   {dict:"心配する", english:"to worry / to be anxious", masu:"心配します", te:"心配して", group:3, hiragana:"しんぱいする", masuHiragana:"しんぱいします", teHiragana:"しんぱいして", nai:"心配しない", naiHiragana:"しんぱいしない"},
-  {dict:"たつ", english:"to stand", masu:"たちます", te:"たって", group:1, hiragana:"たつ", masuHiragana:"たちます", teHiragana:"たって", nai:"たたない", naiHiragana:"たたない"}
+  {dict:"たつ", english:"to stand", masu:"たちます", te:"たって", group:1, hiragana:"たつ", masuHiragana:"たちます", teHiragana:"たって", nai:"たたない", naiHiragana:"たたない"},
+  {dict:"キャンセルする", english:"to cancel", masu:"キャンセルします", te:"キャンセルして", group:3, hiragana:"キャンセルする", masuHiragana:"キャンセルします", teHiragana:"キャンセルして", nai:"キャンセルしない", naiHiragana:"キャンセルしない"},
+  {dict:"けんかする", english:"to fight / to quarrel", masu:"けんかします", te:"けんかして", group:3, hiragana:"けんかする", masuHiragana:"けんかします", teHiragana:"けんかして", nai:"けんかしない", naiHiragana:"けんかしない"},
+  {dict:"更新する", english:"to renew / to update", masu:"更新します", te:"更新して", group:3, hiragana:"こうしんする", masuHiragana:"こうしんします", teHiragana:"こうしんして", nai:"更新しない", naiHiragana:"こうしんしない"},
+  {dict:"迎えに行く", english:"to go pick up (someone)", masu:"迎えに行きます", te:"迎えに行って", group:1, hiragana:"むかえにいく", masuHiragana:"むかえにいきます", teHiragana:"むかえにいって", nai:"迎えに行かない", naiHiragana:"むかえにいかない"},
+  {dict:"緊張する", english:"to be nervous", masu:"緊張します", te:"緊張して", group:3, hiragana:"きんちょうする", masuHiragana:"きんちょうします", teHiragana:"きんちょうして", nai:"緊張しない", naiHiragana:"きんちょうしない"},
+  {dict:"残業する", english:"to work overtime", masu:"残業します", te:"残業して", group:3, hiragana:"ざんぎょうする", masuHiragana:"ざんぎょうします", teHiragana:"ざんぎょうして", nai:"残業しない", naiHiragana:"ざんぎょうしない"},
+  {dict:"脱ぐ", english:"to take off (clothes, shoes)", masu:"脱ぎます", te:"脱いで", group:1, hiragana:"ぬぐ", masuHiragana:"ぬぎます", teHiragana:"ぬいで", nai:"脱がない", naiHiragana:"ぬがない"},
+  {dict:"会員になる", english:"to become a member", masu:"会員になります", te:"会員になって", group:1, hiragana:"かいいんになる", masuHiragana:"かいいんになります", teHiragana:"かいいんになって", nai:"会員にならない", naiHiragana:"かいいんにならない"},
+  {dict:"なる", english:"to become", masu:"なります", te:"なって", group:1, hiragana:"なる", masuHiragana:"なります", teHiragana:"なって", nai:"ならない", naiHiragana:"ならない"}
 ];

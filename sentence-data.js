@@ -280,5 +280,17 @@ window.SENTENCE_PRACTICE = [
   {pattern:"ないほうがいいです", en:"You shouldn't forget the appointment.", jp:"約束を忘れないほうがいいです。", kana:"やくそくをわすれないほうがいいです。"},
   {pattern:"ないほうがいいです", en:"You shouldn't rush.", jp:"急がないほうがいいです。", kana:"いそがないほうがいいです。"},
   {pattern:"ないほうがいいです", en:"It's better not to turn on the lights.", jp:"電気をつけないほうがいいです。", kana:"でんきをつけないほうがいいです。"},
-  {pattern:"ないほうがいいです", en:"You shouldn't forget.", jp:"忘れないほうがいいです。", kana:"わすれないほうがいいです。"}
+  {pattern:"ないほうがいいです", en:"You shouldn't forget.", jp:"忘れないほうがいいです。", kana:"わすれないほうがいいです。"},
+
+  // ~なくてもいいです — "don't have to do ~ / don't need to ~"
+  {pattern:"なくてもいいです", en:"You don't have to hurry today.", jp:"今日は急がなくてもいいです。", kana:"きょうはいそがなくてもいいです。"},
+  {pattern:"なくてもいいです", en:"You don't have to clean the room.", jp:"部屋を掃除しなくてもいいです。", kana:"へやをそうじしなくてもいいです。"},
+  {pattern:"なくてもいいです", en:"You don't have to pay.", jp:"お金を払わなくてもいいです。", kana:"おかねをはらわなくてもいいです。"},
+  {pattern:"なくてもいいです", en:"You don't have to apologize.", jp:"謝らなくてもいいです。", kana:"あやまらなくてもいいです。"},
+  {pattern:"なくてもいいです", en:"You don't have to worry.", jp:"心配しなくてもいいです。", kana:"しんぱいしなくてもいいです。"},
+  {pattern:"なくてもいいです", en:"You don't have to push yourself.", jp:"無理しなくてもいいです。", kana:"むりしなくてもいいです。"},
+  {pattern:"なくてもいいです", en:"I don't have to go to work tomorrow.", jp:"明日、仕事に行かなくてもいいです。", kana:"あした、しごとにいかなくてもいいです。"},
+  {pattern:"なくてもいいです", en:"You don't have to eat everything.", jp:"全部食べなくてもいいです。", kana:"ぜんぶたべなくてもいいです。"},
+  {pattern:"なくてもいいです", en:"You don't have to contact the teacher.", jp:"先生に連絡しなくてもいいです。", kana:"せんせいにれんらくしなくてもいいです。"},
+  {pattern:"なくてもいいです", en:"You don't have to work overtime.", jp:"残業しなくてもいいです。", kana:"ざんぎょうしなくてもいいです。"}
 ];
