@@ -292,5 +292,17 @@ window.SENTENCE_PRACTICE = [
   {pattern:"なくてもいいです", en:"I don't have to go to work tomorrow.", jp:"明日、仕事に行かなくてもいいです。", kana:"あした、しごとにいかなくてもいいです。"},
   {pattern:"なくてもいいです", en:"You don't have to eat everything.", jp:"全部食べなくてもいいです。", kana:"ぜんぶたべなくてもいいです。"},
   {pattern:"なくてもいいです", en:"You don't have to contact the teacher.", jp:"先生に連絡しなくてもいいです。", kana:"せんせいにれんらくしなくてもいいです。"},
-  {pattern:"なくてもいいです", en:"You don't have to work overtime.", jp:"残業しなくてもいいです。", kana:"ざんぎょうしなくてもいいです。"}
+  {pattern:"なくてもいいです", en:"You don't have to work overtime.", jp:"残業しなくてもいいです。", kana:"ざんぎょうしなくてもいいです。"},
+
+  // た form + ら、〜します — "if / when I do ~, I'll ..."
+  {pattern:"たら、〜します", en:"If I go to Japan, I'll take photos.", jp:"日本に行ったら、写真を撮ります。", kana:"にほんにいったら、しゃしんをとります。"},
+  {pattern:"たら、〜します", en:"When I get home, I'll do laundry.", jp:"家に帰ったら、洗濯します。", kana:"いえにかえったら、せんたくします。"},
+  {pattern:"たら、〜します", en:"After I eat, I'll brush my teeth.", jp:"食べたら、歯を磨きます。", kana:"たべたら、はをみがきます。"},
+  {pattern:"たら、〜します", en:"When I finish cleaning, I'll rest.", jp:"掃除したら、休みます。", kana:"そうじしたら、やすみます。"},
+  {pattern:"たら、〜します", en:"When I'm ready, I'll go out.", jp:"準備したら、出かけます。", kana:"じゅんびしたら、でかけます。"},
+  {pattern:"たら、〜します", en:"If I consult the teacher, I'll decide.", jp:"先生に相談したら、きめます。", kana:"せんせいにそうだんしたら、きめます。"},
+  {pattern:"たら、〜します", en:"If I buy a new car, I'll show you.", jp:"新しい車を買ったら、見せます。", kana:"あたらしいくるまをかったら、みせます。"},
+  {pattern:"たら、〜します", en:"If I meet my friend, I'll apologize.", jp:"友達にあったら、謝ります。", kana:"ともだちにあったら、あやまります。"},
+  {pattern:"たら、〜します", en:"When I call, I'll go pick you up.", jp:"電話したら、迎えに行きます。", kana:"でんわしたら、むかえにいきます。"},
+  {pattern:"たら、〜します", en:"If I quit my job, I'll travel.", jp:"仕事を辞めたら、旅行します。", kana:"しごとをやめたら、りょこうします。"}
 ];
