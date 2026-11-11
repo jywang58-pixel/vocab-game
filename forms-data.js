@@ -1,0 +1,71 @@
+// Words for "Forms" practice (polite/short x present/past x positive/negative).
+// Verbs come from vocab-data.js automatically; this file holds the non-verbs.
+// Each entry: text = how it's written, reading = full hiragana reading, english = meaning,
+// type = "i-adj" | "na-adj" | "noun".
+// irregularStem:true marks い-adjectives that conjugate from よ (いい -> よくない, かっこいい -> かっこよくない).
+// Edit this file directly to add/remove words; every form is generated from text + reading.
+window.FORM_WORDS = [
+  // --- い-adjectives ---
+  {type:"i-adj", text:"高い", reading:"たかい", english:"expensive / tall"},
+  {type:"i-adj", text:"安い", reading:"やすい", english:"cheap"},
+  {type:"i-adj", text:"新しい", reading:"あたらしい", english:"new"},
+  {type:"i-adj", text:"古い", reading:"ふるい", english:"old (not for people)"},
+  {type:"i-adj", text:"大きい", reading:"おおきい", english:"big"},
+  {type:"i-adj", text:"小さい", reading:"ちいさい", english:"small"},
+  {type:"i-adj", text:"おいしい", reading:"おいしい", english:"delicious"},
+  {type:"i-adj", text:"忙しい", reading:"いそがしい", english:"busy"},
+  {type:"i-adj", text:"楽しい", reading:"たのしい", english:"fun / enjoyable"},
+  {type:"i-adj", text:"面白い", reading:"おもしろい", english:"interesting / funny"},
+  {type:"i-adj", text:"難しい", reading:"むずかしい", english:"difficult"},
+  {type:"i-adj", text:"暑い", reading:"あつい", english:"hot (weather)"},
+  {type:"i-adj", text:"寒い", reading:"さむい", english:"cold (weather)"},
+  {type:"i-adj", text:"近い", reading:"ちかい", english:"near"},
+  {type:"i-adj", text:"遠い", reading:"とおい", english:"far"},
+  {type:"i-adj", text:"早い", reading:"はやい", english:"early / fast"},
+  {type:"i-adj", text:"悪い", reading:"わるい", english:"bad"},
+  {type:"i-adj", text:"長い", reading:"ながい", english:"long"},
+  {type:"i-adj", text:"多い", reading:"おおい", english:"many / a lot"},
+  {type:"i-adj", text:"少ない", reading:"すくない", english:"few / a little"},
+  {type:"i-adj", text:"若い", reading:"わかい", english:"young"},
+  {type:"i-adj", text:"強い", reading:"つよい", english:"strong"},
+  {type:"i-adj", text:"かわいい", reading:"かわいい", english:"cute"},
+  {type:"i-adj", text:"いい", reading:"いい", english:"good", irregularStem:true},
+  {type:"i-adj", text:"かっこいい", reading:"かっこいい", english:"cool / good-looking", irregularStem:true},
+
+  // --- な-adjectives ---
+  {type:"na-adj", text:"静か", reading:"しずか", english:"quiet"},
+  {type:"na-adj", text:"きれい", reading:"きれい", english:"pretty / clean"},
+  {type:"na-adj", text:"有名", reading:"ゆうめい", english:"famous"},
+  {type:"na-adj", text:"元気", reading:"げんき", english:"healthy / energetic"},
+  {type:"na-adj", text:"親切", reading:"しんせつ", english:"kind"},
+  {type:"na-adj", text:"便利", reading:"べんり", english:"convenient"},
+  {type:"na-adj", text:"好き", reading:"すき", english:"liked / fond of"},
+  {type:"na-adj", text:"嫌い", reading:"きらい", english:"disliked"},
+  {type:"na-adj", text:"上手", reading:"じょうず", english:"skilled"},
+  {type:"na-adj", text:"下手", reading:"へた", english:"unskilled"},
+  {type:"na-adj", text:"大変", reading:"たいへん", english:"tough / hard"},
+  {type:"na-adj", text:"暇", reading:"ひま", english:"free (not busy)"},
+  {type:"na-adj", text:"にぎやか", reading:"にぎやか", english:"lively"},
+  {type:"na-adj", text:"大切", reading:"たいせつ", english:"important"},
+  {type:"na-adj", text:"簡単", reading:"かんたん", english:"simple / easy"},
+  {type:"na-adj", text:"丈夫", reading:"じょうぶ", english:"sturdy / durable"},
+  {type:"na-adj", text:"大丈夫", reading:"だいじょうぶ", english:"okay / alright"},
+
+  // --- nouns ---
+  {type:"noun", text:"学生", reading:"がくせい", english:"student"},
+  {type:"noun", text:"先生", reading:"せんせい", english:"teacher"},
+  {type:"noun", text:"会社員", reading:"かいしゃいん", english:"office worker"},
+  {type:"noun", text:"医者", reading:"いしゃ", english:"doctor"},
+  {type:"noun", text:"友達", reading:"ともだち", english:"friend"},
+  {type:"noun", text:"休み", reading:"やすみ", english:"day off / holiday"},
+  {type:"noun", text:"雨", reading:"あめ", english:"rain"},
+  {type:"noun", text:"天気", reading:"てんき", english:"weather"},
+  {type:"noun", text:"本", reading:"ほん", english:"book"},
+  {type:"noun", text:"日曜日", reading:"にちようび", english:"Sunday"},
+  {type:"noun", text:"誕生日", reading:"たんじょうび", english:"birthday"},
+  {type:"noun", text:"宿題", reading:"しゅくだい", english:"homework"},
+  {type:"noun", text:"試験", reading:"しけん", english:"exam"},
+  {type:"noun", text:"仕事", reading:"しごと", english:"job / work"},
+  {type:"noun", text:"銀行", reading:"ぎんこう", english:"bank"},
+  {type:"noun", text:"駅", reading:"えき", english:"station"}
+];

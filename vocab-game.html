@@ -189,11 +189,12 @@
       </div>
     </div>
     <div class="modes" id="modeSelector">
-      <button class="mode-btn active" data-mode="mixed">Mixed</button>
-      <button class="mode-btn" data-mode="mc">Multiple Choice</button>
+      <!-- <button class="mode-btn" data-mode="mixed">Mixed</button> -->
+      <button class="mode-btn active" data-mode="mc">Multiple Choice</button>
       <button class="mode-btn" data-mode="type">Typing</button>
       <button class="mode-btn" data-mode="pattern">Patterns</button>
-      <button class="mode-btn" data-mode="sentence">Sentences</button>
+      <button class="mode-btn" data-mode="forms">Forms</button>
+      <!-- <button class="mode-btn" data-mode="sentence">Sentences</button> -->
     </div>
   </header>
 
@@ -230,6 +231,7 @@
 
 <script src="vocab-data.js"></script>
 <script src="sentence-data.js"></script>
+<script src="forms-data.js"></script>
 <script>
 (function(){
   // ---------- Fallback seed data (used only if vocab-data.js is missing/empty) ----------
@@ -262,7 +264,7 @@
   }
 
   // ---------- State ----------
-  var MODES_FOR_STATS = ["mixed","mc","type","pattern","sentence"];
+  var MODES_FOR_STATS = ["mixed","mc","type","pattern","sentence","forms"];
 
   function loadBestByMode(){
     var result = {};
@@ -281,11 +283,11 @@
   var state = {
     words: [],
     weights: {},           // word.dict -> weight (higher = shown more often)
-    mode: "mixed",
+    mode: "mc",             // was "mixed" while the Mixed tab is commented out
     current: null,          // current question object
     xp: 0,
     level: 1,
-    streaksByMode: {mixed:0, mc:0, type:0, pattern:0, sentence:0},
+    streaksByMode: {mixed:0, mc:0, type:0, pattern:0, sentence:0, forms:0},
     bestByMode: loadBestByMode(),
     correct: 0,
     answered: 0,
@@ -295,7 +297,8 @@
     dictToHiragana: {},
     knownWords: {},         // dict -> true, words that have graduated past "new" status
     newCorrectCounts: {},   // dict -> correct answers so far while still marked new
-    lastSentenceIndex: -1
+    lastSentenceIndex: -1,
+    lastFormText: ""
   };
 
   var sounds = {
@@ -443,6 +446,7 @@
     var mode = state.mode;
     if (mode === "sentence"){ renderSentence(); return; }
     if (mode === "pattern"){ renderPattern(); return; }
+    if (mode === "forms"){ renderForms(); return; }
 
     var word = pickWord(state.current && state.current.word ? state.current.word.dict : null);
     if (mode === "mixed") mode = Math.random() < 0.65 ? "mc" : "type";
@@ -681,6 +685,199 @@
     Array.prototype.forEach.call(els.card.querySelectorAll(".choice-btn"), function(btn){
       btn.addEventListener("click", function(){ handleMCAnswer(btn, options); });
     });
+  }
+
+  // ---------- Forms practice: polite/short x present/past x positive/negative ----------
+  // Works for verbs (from vocab-data.js) and い-adjectives, な-adjectives and nouns (forms-data.js).
+  var FORM_SPECS = [
+    {key:"polite-present-pos", label:"Polite · present · positive"},
+    {key:"polite-present-neg", label:"Polite · present · negative"},
+    {key:"polite-past-pos",    label:"Polite · past · positive"},
+    {key:"polite-past-neg",    label:"Polite · past · negative"},
+    {key:"short-present-pos",  label:"Short · present · positive"},
+    {key:"short-present-neg",  label:"Short · present · negative"},
+    {key:"short-past-pos",     label:"Short · past · positive"},
+    {key:"short-past-neg",     label:"Short · past · negative"}
+  ];
+  var FORM_CATEGORY_LABELS = {"verb":"Verb", "i-adj":"い-adjective", "na-adj":"な-adjective", "noun":"Noun"};
+
+  function taFromTe(te){ // た form is a regular て/で -> た/だ swap on the te form
+    if (!te) return null;
+    var last = te.slice(-1);
+    if (last === "て") return te.slice(0, -1) + "た";
+    if (last === "で") return te.slice(0, -1) + "だ";
+    return null;
+  }
+
+  // Each *FormSet returns {formKey: [primary answer, ...also-accepted answers]}
+  function verbFormSet(dict, masu, nai, te){
+    var stem = masu.slice(0, -2); // drop ます
+    var ta = taFromTe(te);
+    return {
+      "polite-present-pos": [masu],
+      "polite-present-neg": [stem + "ません"],
+      "polite-past-pos":    [stem + "ました"],
+      "polite-past-neg":    [stem + "ませんでした"],
+      "short-present-pos":  [dict],
+      "short-present-neg":  [nai],
+      "short-past-pos":     ta ? [ta] : [],
+      "short-past-neg":     [nai.slice(0, -1) + "かった"]
+    };
+  }
+  function iAdjFormSet(text, irregularStem){
+    var stem = irregularStem ? text.slice(0, -2) + "よ" : text.slice(0, -1); // いい -> よ~
+    return {
+      "polite-present-pos": [text + "です"],
+      "polite-present-neg": [stem + "くないです", stem + "くありません"],
+      "polite-past-pos":    [stem + "かったです"],
+      "polite-past-neg":    [stem + "くなかったです", stem + "くありませんでした"],
+      "short-present-pos":  [text],
+      "short-present-neg":  [stem + "くない"],
+      "short-past-pos":     [stem + "かった"],
+      "short-past-neg":     [stem + "くなかった"]
+    };
+  }
+  function naNounFormSet(text){
+    return {
+      "polite-present-pos": [text + "です"],
+      "polite-present-neg": [text + "じゃないです", text + "ではないです", text + "じゃありません", text + "ではありません"],
+      "polite-past-pos":    [text + "でした"],
+      "polite-past-neg":    [text + "じゃなかったです", text + "ではなかったです", text + "じゃありませんでした", text + "ではありませんでした"],
+      "short-present-pos":  [text + "だ"],
+      "short-present-neg":  [text + "じゃない", text + "ではない"],
+      "short-past-pos":     [text + "だった"],
+      "short-past-neg":     [text + "じゃなかった", text + "ではなかった"]
+    };
+  }
+
+  // Returns {text, reading, english, kanji:{...forms}, kana:{...forms}} for any category.
+  function buildForms(cat, item){
+    if (cat === "verb"){
+      return {
+        text: item.dict, reading: item.hiragana || item.dict, english: item.english,
+        kanji: verbFormSet(item.dict, item.masu, item.nai, item.te),
+        kana:  verbFormSet(item.hiragana || item.dict, item.masuHiragana || item.masu, item.naiHiragana || item.nai, item.teHiragana || item.te)
+      };
+    }
+    if (cat === "i-adj"){
+      return {
+        text: item.text, reading: item.reading, english: item.english,
+        kanji: iAdjFormSet(item.text, item.irregularStem),
+        kana:  iAdjFormSet(item.reading, item.irregularStem)
+      };
+    }
+    return { // na-adj and noun conjugate identically
+      text: item.text, reading: item.reading, english: item.english,
+      kanji: naNounFormSet(item.text),
+      kana:  naNounFormSet(item.reading)
+    };
+  }
+
+  function formsPool(){
+    var pool = {
+      "verb": state.words.filter(function(w){ return w.masu && w.nai && w.te; }),
+      "i-adj": [], "na-adj": [], "noun": []
+    };
+    (window.FORM_WORDS || []).forEach(function(x){
+      if (pool[x.type] && x.text && x.reading) pool[x.type].push(x);
+    });
+    return pool;
+  }
+
+  function renderForms(){
+    var pool = formsPool();
+    var cats = Object.keys(pool).filter(function(c){ return pool[c].length; });
+    if (!cats.length){ renderType(pickWord(null)); return; } // nothing to practice, safe fallback
+    var cat = cats[Math.floor(Math.random()*cats.length)]; // each category equally likely
+
+    var item, vocabWord = null;
+    if (cat === "verb"){
+      item = pickWord(state.current && state.current.word ? state.current.word.dict : null);
+      if (!(item.masu && item.nai && item.te)) item = pool.verb[Math.floor(Math.random()*pool.verb.length)];
+      vocabWord = item; // verbs also feed the weighting / "New" tracking, like the other modes
+    } else {
+      var list = pool[cat], tries = 0;
+      do { item = list[Math.floor(Math.random()*list.length)]; tries++; }
+      while (list.length > 1 && item.text === state.lastFormText && tries < 6);
+      state.lastFormText = item.text;
+    }
+
+    var built = buildForms(cat, item);
+    var spec = FORM_SPECS[Math.floor(Math.random()*FORM_SPECS.length)];
+    var answers = built.kanji[spec.key];
+    var primary = answers[0];
+    var acceptable = [];
+    answers.concat(built.kana[spec.key]).forEach(function(a){ if (a && acceptable.indexOf(a) === -1) acceptable.push(a); });
+
+    state.current = {mode:"forms", word:vocabWord, correctAnswer:primary, acceptable:acceptable, alsoOk:answers.slice(1)};
+
+    var html = '<div class="card-top"><div class="card-top-left">';
+    html += (vocabWord && isNewWord(vocabWord)) ? '<div class="badge-new">✨ New</div>' : '<div></div>';
+    html += muteBtnHtml();
+    html += '</div><div class="badge-cluster">';
+    html += '<div class="badge-group">' + escapeHtml(vocabWord && vocabWord.group ? groupLabel(vocabWord.group) : FORM_CATEGORY_LABELS[cat]) + '</div>';
+    html += '</div></div><div class="card-body">';
+    html += '<div class="prompt-label">' + escapeHtml(spec.label) + '</div>';
+    html += '<div class="prompt-word">' + furiganaHtml(built.text, built.reading) + '</div>';
+    html += '<div class="prompt-sub">' + escapeHtml(built.english) + ' &middot; ' + escapeHtml(FORM_CATEGORY_LABELS[cat]) + '</div>';
+
+    var useMC = Math.random() < 0.65; // same multiple-choice / typing balance the old Mixed mode used
+    var options = null;
+    if (useMC){
+      // wrong answers are the other seven forms of the same word, minus anything also accepted as correct
+      var others = [];
+      FORM_SPECS.forEach(function(s){
+        var v = built.kanji[s.key][0];
+        if (s.key !== spec.key && v && acceptable.indexOf(v) === -1 && others.indexOf(v) === -1) others.push(v);
+      });
+      others = shuffle(others).slice(0, 3);
+      options = shuffle([primary].concat(others));
+      html += '<div class="choices">';
+      options.forEach(function(opt){
+        html += '<button class="choice-btn" data-val="' + escapeAttr(opt) + '">' + escapeHtml(opt) + '</button>';
+      });
+      html += '</div></div>';
+    } else {
+      html += '<form class="type-form" id="typeForm">';
+      html += '<input class="type-input" id="typeInput" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="answer in Japanese">';
+      html += '<div class="type-actions"><button type="submit" class="primary-btn">Check</button></div>';
+      html += '<div class="feedback-line" id="typeFeedback"></div>';
+      html += '</form></div>';
+    }
+    els.card.innerHTML = html;
+    wireMuteBtn();
+
+    if (useMC){
+      Array.prototype.forEach.call(els.card.querySelectorAll(".choice-btn"), function(btn){
+        btn.addEventListener("click", function(){ handleMCAnswer(btn, options); });
+      });
+    } else {
+      var input = document.getElementById("typeInput");
+      input.focus();
+      document.getElementById("typeForm").addEventListener("submit", function(e){
+        e.preventDefault();
+        submitForm(input.value);
+      });
+    }
+  }
+
+  function submitForm(value){
+    var input = document.getElementById("typeInput");
+    var feedback = document.getElementById("typeFeedback");
+    if (input.disabled) return;
+    input.disabled = true;
+    var typed = normalizeJp(value);
+    var wasCorrect = state.current.acceptable.some(function(a){ return normalizeJp(a) === typed; });
+    if (wasCorrect){
+      feedback.textContent = "✓ Correct!";
+      feedback.className = "feedback-line good";
+    } else {
+      var also = state.current.alsoOk;
+      feedback.textContent = "✗ Correct answer: " + state.current.correctAnswer + (also.length ? "  (also OK: " + also.join(" / ") + ")" : "");
+      feedback.className = "feedback-line bad";
+    }
+    registerAnswer(wasCorrect);
+    setTimeout(nextButtonRow, wasCorrect ? 700 : 8800);
   }
 
   function nextButtonRow(){ startRound(); }
